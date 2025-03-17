@@ -1,0 +1,7 @@
+
+// to push into the remote repository
+
+git commit -am "second commit"
+
+git push origin master
+

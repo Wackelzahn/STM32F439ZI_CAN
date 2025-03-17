@@ -1,9 +1,9 @@
 
 // to push into the remote repository
 
-git commit -am "second commit"
+// 1. git commit -am "second commit"
 
-git push origin master
+// 2. git push origin master
 
 // add a new file to the repo
-git add new_file
+// 3. git add new_file

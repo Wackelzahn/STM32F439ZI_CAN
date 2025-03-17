@@ -5,3 +5,5 @@ git commit -am "second commit"
 
 git push origin master
 
+// add a new file to the repo
+git add new_file

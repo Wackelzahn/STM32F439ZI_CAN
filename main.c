@@ -18,7 +18,7 @@
 
  
 // USART1 to be used with F411RE, USART2  to be used with F429ZI 
-
+// ..
 
 #include <inttypes.h>
 #include <stdbool.h>

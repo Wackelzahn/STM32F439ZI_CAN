@@ -16,7 +16,7 @@
 //    - CAN communication
 // -----------------------------------------------------
 
- 
+
 // USART1 to be used with F411RE, USART2  to be used with F429ZI 
 // ..
 
@@ -26,8 +26,9 @@
 #include "registers.h"
 #include "serial.h"
 #include "conversion.h"
+#include "can.h"
 
-#define FREQ 16000000  // CPU frequency, 8 Mhz
+#define FREQ 16000000  // PCLK, internal clock by default, 16 Mhz
 #define BIT(x) (1UL << (x))
 
 static volatile uint32_t pick = 0;
@@ -77,6 +78,7 @@ static inline void systick_init(uint32_t ticks) {
   SYST->CSR = BIT(0) | BIT(1) | BIT(2);  // Enable systick
   RCC->APB2ENR |= BIT(14);               // Enable SYSCFG
 }
+
 static inline void PA5_out_init() {
   RCC->AHB1ENR |= 1 << 0;             // Enable GPIOA clock
   GPIOA->MODER |= 1 << 10;            // Set PA5 to output mode
@@ -92,25 +94,22 @@ static inline void PB7_out_init() {
 
 int main(void) {
   
-  systick_init(FREQ / 1);  // 1s second (STM32F4 runs at 8MHz)
-  // PA5_out_init();  // Set blue LED to output mode
-  PB7_out_init();  // Set blue LED to output mode
-  // uart_init(UART1, 9600);  // Initialize UART1 with 9600 baud rate
-  uart_init(UART2, 9600);  // Initialize UART2 with 9600 baud rate
-  
-  while (1) {
+  Can_Init(CAN1);
+  systick_init(FREQ / 1);   // 1s second (STM32F4 runs at 16MHz)
+  PB7_out_init();           // Set blue LED to output mode
+  uart_init(UART2, 9600);   // Initialize UART2 with 9600 baud rate
 
+  zonk = CAN1->FA1R;
+
+  while (1) {
+  
     lenght = int2char(myNum, txt);
     //uart_write_buf(UART1, txt, lenght);
     spin(999999);  // Delay
 
-   // if (uart_read_ready(UART1)) {
-    //  char c = uart_read_byte(UART1);
-    //  uart_write_buf(UART1, &c, 1);
-   // }
 
     if (kazuka) {
-      //uart_write_buf(UART1, &bla, 1);
+ 
       uart_write_buf(UART2, &bla, 1);
       kazuka = false;
     }

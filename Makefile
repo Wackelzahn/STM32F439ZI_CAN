@@ -7,6 +7,7 @@ SOURCES = main.c
 
 SOURCES += src/serial.c
 SOURCES += src/conversion.c
+SOURCES += src/can.c
 
 
 ifeq ($(OS),Windows_NT)

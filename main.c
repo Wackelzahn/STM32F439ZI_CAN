@@ -95,6 +95,9 @@ static inline void PB7_out_init() {
 int main(void) {
   
   Can_Init(CAN1);
+  Can_Filter(CAN1, 0x446);
+  //Can_Start(CAN1);
+
   systick_init(FREQ / 1);   // 1s second (STM32F4 runs at 16MHz)
   PB7_out_init();           // Set blue LED to output mode
   uart_init(UART2, 9600);   // Initialize UART2 with 9600 baud rate

@@ -5,39 +5,29 @@
 #include <inttypes.h>
 #include "registers.h"
 
-typedef struct CAN_TX_Typedef {     // struct Name
-	int id_type;
-	int frame_type;
-	int send_timestamp;
-	int32_t ID;
-	int data_length;
-	int data[8];
-} CAN_TX_Typedef;                    // typedef Name
+struct CAN_TX_FRAME 		// struct tag
+{    
+	uint32_t identifier;
+	uint8_t length;
+	uint8_t data[8];
+} typedef CAN_TX_FRAME; 	// typedef Name
 
 
-typedef struct CAN_RX_Typedef {
-	int message_timestamp;
-	int data_length;
-	int data[8];
-	int filter_index;
-	int frame_type;
-	int id_type;
-	int32_t ID;
-} CAN_RX_Typedef;
+struct CAN_RX_FRAME 
+{
+	uint32_t identifier;
+	uint8_t length;
+	uint8_t data[8];
+} typedef CAN_RX_FRAME;
 
-typedef struct CAN_Filter_TypeDef {
-	int filter_id;
-	int enable;
-	int id_type;
-	int frame_type;
-	int type;
-	int scale;
-	int bank_id;
-	uint32_t ID;
-} CAN_Filter_TypeDef;
+
 
 // function declarations
-void Can_Init(struct can *can);
+void Can_Init (struct can *can);
+void Can_Start (struct can *can);
+void Can_Filter (struct can *can, uint16_t identifier);
+void Can_SendMessage (CAN_TX_FRAME *TXFrame);
+void Can_ReceiveMessage (CAN_RX_FRAME *RXFrame);
 
 
 #endif

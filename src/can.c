@@ -57,8 +57,36 @@ void Can_Init(struct can *can) {
 
     }
 
+
 void Can_Start (struct can *can) {
     // Leave Initialization Mode
-    can->MCR &= ~BIT(0);            // Clear 
+    can->MCR &= ~BIT(0);            // Clear INRQ to go to "normal mode"
     while (can->MSR & BIT(0));      // Check INAK (if clear then ini finished)
+
+    // this function needs a check loop if the hw can not synchronize to the bus.
+    // then return to the main function with "bad"
+
+    }
+
+
+void Can_Filter (struct can *can, uint16_t identifier) {
+    can->FMR |= BIT(0);             // set FINIT, Filter init mode on
+    can->FMR &= ~(0x00003F00U);      // Slave Filter to start from 20
+    can->FMR |= (20<< 8);           // CAN1 Filter is assigned from 0 to 19.
+    
+    can->FA1R &= ~(BIT(18));        // deactivate filter 18
+    can->FS1R |= BIT(18);           // Set for 32bit scale config
+
+    can->FM1R &= ~BIT(18);          // Set to 0 for identifier "mask" mode
+                                    // FSC18 = 1, FBM18 = 0 *mapping see Figure 342
+    can->F18R1 = (identifier << 5) << 16;    // Identifier *shift the ID (11bit) to the most left.
+    can->F18R2 = (identifier << 5) << 16;    // Identifier Mask
+
+    can->FFA1R &= ~BIT(18);         // Filter 18 assigned to FIFO-0
+    can->FA1R |= BIT(18);           // activate Filter 18
+
+    can->FMR &= ~BIT(0);            // clear the filter init mode
+
 }
+
+

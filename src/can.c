@@ -1,6 +1,6 @@
 
 // Created: 2025-03-19 07:00:00
-// Author: Michael Schneider
+// Author: M. Schneider
 // -----------------------------------------------------
 // Target Device: STM32FF439ZI
 // -----------------------------------------------------
@@ -58,20 +58,32 @@ void Can_Init(struct can *can) {
     }
 
 
-void Can_Start (struct can *can) {
+bool Can_Start (struct can *can) {
     // Leave Initialization Mode
-    can->MCR &= ~BIT(0);            // Clear INRQ to go to "normal mode"
-    while (can->MSR & BIT(0));      // Check INAK (if clear then ini finished)
+    
+    /* only for testing "loopback mode"
+    to be deleted after test*/
 
-    // this function needs a check loop if the hw can not synchronize to the bus.
-    // then return to the main function with "bad"
+    can->BTR |= BIT(30);            // Loop Back Mode enabled.
+    
+    can->MCR &= ~BIT(0);            // Clear INRQ to go to "normal mode"
+    
+    for (int i=0; i<100; i++)      // wait a little 
+    {
+        asm("nop");
+    }
+
+    if (can->MSR & BIT(0)) {        // Check INAK (if clear then ini finished)
+        return (0);                 // return no success
+    }      
+    else return (1);                // return success
 
     }
 
 
 void Can_Filter (struct can *can, uint16_t identifier) {
     can->FMR |= BIT(0);             // set FINIT, Filter init mode on
-    can->FMR &= ~(0x00003F00U);      // Slave Filter to start from 20
+    can->FMR &= ~(0x00003F00U);     // Slave Filter to start from 20
     can->FMR |= (20<< 8);           // CAN1 Filter is assigned from 0 to 19.
     
     can->FA1R &= ~(BIT(18));        // deactivate filter 18
@@ -124,7 +136,6 @@ void Can_ReceiveMessage (struct can *can, CAN_RX_FRAME *RXFrame) {
                 RXFrame->data[0]=0;
             }
         
-
         RXFrame->data[0]=(uint8_t)(can->RDL0R >> 0U);
         RXFrame->data[1]=(uint8_t)(can->RDL0R >> 8U);
         RXFrame->data[2]=(uint8_t)(can->RDL0R >> 16U);

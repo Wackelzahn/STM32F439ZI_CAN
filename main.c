@@ -35,6 +35,9 @@ static volatile uint32_t pick = 0;
 
 
 char charstr[] = "Hello World!\r\n";
+char mesg1[] = "success, can started!\r\n";
+char mesg2[] = "no success, can not started!\r\n";
+
 uint32_t zonk = 0;
 
 uint32_t zonkchar = 0;
@@ -94,15 +97,29 @@ static inline void PB7_out_init() {
 
 int main(void) {
   
-  Can_Init(CAN1);
-  Can_Filter(CAN1, 0x446);
-  //Can_Start(CAN1);
-
   systick_init(FREQ / 1);   // 1s second (STM32F4 runs at 16MHz)
   PB7_out_init();           // Set blue LED to output mode
   uart_init(UART2, 9600);   // Initialize UART2 with 9600 baud rate
 
-  zonk = CAN1->FA1R;
+
+
+
+  Can_Init(CAN1);
+  Can_Filter(CAN1, 0x446);
+  if (Can_Start(CAN1)) {
+    lenght = lenghtofarray(mesg1);
+    uart_write_buf(UART2, mesg1, lenght);
+  }
+  else {
+    lenght = lenghtofarray(mesg2);
+    uart_write_buf(UART2, mesg2, lenght);
+  }
+
+ // try in 1 sec again..... to be implemented.1!
+
+  //zonk = CAN1->FA1R;
+
+
 
   while (1) {
   
@@ -112,7 +129,6 @@ int main(void) {
 
 
     if (kazuka) {
- 
       uart_write_buf(UART2, &bla, 1);
       kazuka = false;
     }

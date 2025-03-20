@@ -66,12 +66,15 @@ bool Can_Start (struct can *can) {
 
     // can->BTR |= BIT(30);            // Loop Back Mode enabled.
     
+    can->MCR &= ~BIT(1);            // Clear SLEEP
     can->MCR &= ~BIT(0);            // Clear INRQ to go to "normal mode"
     
     for (int i=0; i<100; i++)      // wait a little 
     {
         asm("nop");
     }
+
+
 
     if (can->MSR & BIT(0)) {        // Check INAK (if clear then ini finished)
         return (0);                 // return no success
@@ -106,6 +109,7 @@ void Can_SendMessage (struct can *can, CAN_TX_FRAME *TXFrame) {
     can->TI0R &= ~(BIT(2));                     // set "standart" identifier
     can->TI0R |= (TXFrame->identifier << 21);   // set the identifier
     can->TDT0R |= TXFrame->length << 0;         // set the data length
+    can->TDT0R &= ~BIT(8);                      // no time stamp
 
     // store the data into the mailbox LOW
     can->TDL0R = 

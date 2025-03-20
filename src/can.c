@@ -89,4 +89,54 @@ void Can_Filter (struct can *can, uint16_t identifier) {
 
 }
 
+void Can_SendMessage (struct can *can, CAN_TX_FRAME *TXFrame) {
+    while ((can->TSR & BIT(26)) == 0);          // wait until transmit mailbox 0 is empty *TME0->Bit26
+    can->TI0R &= ~(BIT(2));                     // set "standart" identifier
+    can->TI0R |= (TXFrame->identifier << 21);   // set the identifier
+    can->TDT0R |= TXFrame->length << 0;         // set the data length
+
+    // store the data into the mailbox LOW
+    can->TDL0R = 
+        ((uint32_t) TXFrame->data[3] << 24) |
+        ((uint32_t) TXFrame->data[3] << 16) |
+        ((uint32_t) TXFrame->data[3] << 8) |
+        ((uint32_t) TXFrame->data[3] << 0);  
+    // store the data into the mailbox HIGH
+    can->TDH0R = 
+        ((uint32_t) TXFrame->data[7] << 24) |
+        ((uint32_t) TXFrame->data[6] << 16) |
+        ((uint32_t) TXFrame->data[5] << 8) |
+        ((uint32_t) TXFrame->data[4] << 0);  
+    
+    // start the transmission
+    can->TI0R |= BIT(0);        // transmission request TXRQ
+    
+}
+
+void Can_ReceiveMessage (struct can *can, CAN_RX_FRAME *RXFrame) {
+    if (can->RF0R & 0x00000003U)            // If FIFO-0 has pending message
+        {      
+            RXFrame->identifier = (can->RI0R >> 3) & 0x1FFFFFFF;    // get identifier of data
+            RXFrame->length = can->RDT0R & 0x0F;                    // get legth of data
+            
+            for (int i=0; i<8; i++)         // clear the old data before getting new one from FIFO
+            {
+                RXFrame->data[0]=0;
+            }
+        
+
+        RXFrame->data[0]=(uint8_t)(can->RDL0R >> 0U);
+        RXFrame->data[1]=(uint8_t)(can->RDL0R >> 8U);
+        RXFrame->data[2]=(uint8_t)(can->RDL0R >> 16U);
+        RXFrame->data[3]=(uint8_t)(can->RDL0R >> 24U);
+        RXFrame->data[4]=(uint8_t)(can->RDH0R >> 0U);
+        RXFrame->data[5]=(uint8_t)(can->RDH0R >> 8U);
+        RXFrame->data[6]=(uint8_t)(can->RDH0R >> 16U);
+        RXFrame->data[7]=(uint8_t)(can->RDH0R >> 24U);
+
+        can->RF0R |= BIT(5);        // Release the FIFO
+
+        }
+}
+
 

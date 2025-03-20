@@ -5,20 +5,20 @@
 #include <inttypes.h>
 #include "registers.h"
 
-struct CAN_TX_FRAME 		// struct tag
+typedef struct CAN_TX_FRAME 		// struct tag
 {    
 	uint32_t identifier;
 	uint8_t length;
 	uint8_t data[8];
-} typedef CAN_TX_FRAME; 	// typedef Name
+} CAN_TX_FRAME; 	// typedef Name
 
 
-struct CAN_RX_FRAME 
+typedef struct CAN_RX_FRAME 
 {
 	uint32_t identifier;
 	uint8_t length;
 	uint8_t data[8];
-} typedef CAN_RX_FRAME;
+} CAN_RX_FRAME;
 
 
 
@@ -26,8 +26,8 @@ struct CAN_RX_FRAME
 void Can_Init (struct can *can);
 void Can_Start (struct can *can);
 void Can_Filter (struct can *can, uint16_t identifier);
-void Can_SendMessage (CAN_TX_FRAME *TXFrame);
-void Can_ReceiveMessage (CAN_RX_FRAME *RXFrame);
+void Can_SendMessage (struct can *can, CAN_TX_FRAME *TXFrame);
+void Can_ReceiveMessage (struct can *can, CAN_RX_FRAME *RXFrame);
 
 
 #endif

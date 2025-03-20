@@ -64,7 +64,7 @@ bool Can_Start (struct can *can) {
     /* only for testing "loopback mode"
     to be deleted after test*/
 
-    can->BTR |= BIT(30);            // Loop Back Mode enabled.
+    // can->BTR |= BIT(30);            // Loop Back Mode enabled.
     
     can->MCR &= ~BIT(0);            // Clear INRQ to go to "normal mode"
     

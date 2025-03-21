@@ -37,6 +37,8 @@ static volatile uint32_t pick = 0;
 char charstr[] = "Hello World!\r\n";
 char mesg1[] = "success, can started!\r\n";
 char mesg2[] = "no success, can not started!\r\n";
+char mesg3[] = "trying to start can bus ";
+char mesg4[] = ".";
 
 uint32_t zonk = 0;
 
@@ -49,7 +51,7 @@ char bla;
 char txt[10];
 uint32_t myNum = 3367756;
 int lenght = 0;
-
+int i = 0;
 
 
 void SysTick_Handler(void) {
@@ -106,14 +108,37 @@ int main(void) {
 
   Can_Init(CAN1);
   Can_Filter(CAN1, 0x446);
-  if (Can_Start(CAN1)) {
+  if (Can_Start(CAN1)) {                // can start successfull
     lenght = lenghtofarray(mesg1);
     uart_write_buf(UART2, mesg1, lenght);
+    i = 0;
   }
-  else {
-    lenght = lenghtofarray(mesg2);
-    uart_write_buf(UART2, mesg2, lenght);
+  else {       
+    i = 0;
+    lenght = lenghtofarray(mesg3);
+    uart_write_buf(UART2, mesg3, lenght);   // can not started, trying again
+    while (i<10) {
+      if (!(Can_Start(CAN1))) {
+        lenght = lenghtofarray(mesg4);
+        uart_write_buf(UART2, mesg4, lenght);
+        i++;
+        if (i==10) {
+          lenght = lenghtofarray(mesg2);
+          uart_write_buf(UART2, mesg2, lenght);
+        }
+      }
+      else {
+        lenght = lenghtofarray(mesg1);
+        uart_write_buf(UART2, mesg1, lenght);
+        i = 10;
+      }
+  
+    }
+
+
   }
+
+
 
  // try in 1 sec again..... to be implemented.1!
 
@@ -159,8 +184,13 @@ extern void _estack(void);  // Defined in link.ld
 
 // 16 standard and 91 STM32-specific handlers
 __attribute__((section(".vectors"))) void (*const tab[16 + 91])(void) = {
-  _estack, _reset, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, SysTick_Handler, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-  0, 0, 0, 0, 0, 0, 0, USART1_IRQHandler, USART2_IRQHandler, 0,};
+  _estack, _reset, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, SysTick_Handler,
+  // IRQ0 to IRQ36 (positions 16 to 52)
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // IRQ0 .. IRQ9
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // IRQ10 .. IRQ19
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // IRQ20 .. IRQ29
+  0, 0, 0, 0, 0, 0, 0,          // IRQ30 .. IRQ36
+  USART1_IRQHandler,  // IRQ37
+  USART2_IRQHandler,  // IRQ38
+  0,0,0};
 

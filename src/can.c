@@ -36,11 +36,11 @@ void Can_Init(struct can *can) {
     GPIOD->MODER &= ~BIT(2);
     GPIOD->AFRL |= (0x09 << 0)|(0x09 << 1); // set AF9 for pin 0 and pin 1
     
-    RCC->APB1ENR |= BIT(25);        // enable the clock for can1
+    RCC->APB1ENR |= BIT(25);       // enable the clock for can1
     can->MCR |= BIT(0);            // enable can initialization mode
     while (!(can->MSR & BIT(0)));  // check if INAK bit is set *meaning HW is in init. --> check if syntax is ok.
     can->MCR &= ~BIT(1);           // exit sleep mode
-    while ((can->MSR & BIT(1))!=0U);   // check SLAK bit is clear *meaning no sleep
+    while (!(can->MSR & BIT(1)));  // check SLAK bit is clear *meaning no sleep
 
     /* configure the timing with following parameters
         * Normal Mode

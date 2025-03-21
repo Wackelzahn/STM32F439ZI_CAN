@@ -67,6 +67,9 @@ bool Can_Start (struct can *can) {
 
     // can->BTR |= BIT(30);            // Loop Back Mode enabled.
     
+    NVIC->ISER[0] = 0xFFFFFFFF;     // need to find out shich one it is.
+    can->IER |= BIT(4);              // enable Receive Interrupt
+
     can->MCR &= ~BIT(1);            // Clear SLEEP
     can->MCR &= ~BIT(0);            // Clear INRQ to go to "normal mode"
     
@@ -106,27 +109,28 @@ void Can_Filter (struct can *can, uint16_t identifier) {
 }
 
 void Can_SendMessage (struct can *can, CAN_TX_FRAME *TXFrame) {
-    while ((can->TSR & BIT(26)) == 0);          // wait until transmit mailbox 0 is empty *TME0->Bit26
-    can->TI0R &= ~(BIT(2));                     // set "standart" identifier
+    while ((can->TSR & (0x1UL << 26U)) == 0);          // wait until transmit mailbox 0 is empty *TME0->Bit26
+    can->TI0R &= ~(0x7FFUL << 21U);             // set "standart" identifier
+    can->TI0R &= ~BIT(1);                       // set Data Frame
     can->TI0R |= (TXFrame->identifier << 21);   // set the identifier
     can->TDT0R |= TXFrame->length << 0;         // set the data length
-    can->TDT0R &= ~BIT(8);                      // no time stamp
+    
 
     // store the data into the mailbox LOW
     can->TDL0R = 
-        ((uint32_t) TXFrame->data[3] << 24) |
-        ((uint32_t) TXFrame->data[3] << 16) |
-        ((uint32_t) TXFrame->data[3] << 8) |
-        ((uint32_t) TXFrame->data[3] << 0);  
+        ((uint32_t) TXFrame->data[3] << 24U) |
+        ((uint32_t) TXFrame->data[2] << 16U) |
+        ((uint32_t) TXFrame->data[1] << 8U) |
+        ((uint32_t) TXFrame->data[0] << 0U);  
     // store the data into the mailbox HIGH
     can->TDH0R = 
-        ((uint32_t) TXFrame->data[7] << 24) |
-        ((uint32_t) TXFrame->data[6] << 16) |
-        ((uint32_t) TXFrame->data[5] << 8) |
-        ((uint32_t) TXFrame->data[4] << 0);  
+        ((uint32_t) TXFrame->data[7] << 24U) |
+        ((uint32_t) TXFrame->data[6] << 16U) |
+        ((uint32_t) TXFrame->data[5] << 8U) |
+        ((uint32_t) TXFrame->data[4] << 0U);  
     
     // start the transmission
-    can->TI0R |= BIT(0);        // transmission request TXRQ
+    can->TI0R |= (1U << 0U);        // transmission request TXRQ
     
 }
 

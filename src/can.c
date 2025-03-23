@@ -37,8 +37,10 @@ void Can_Init(struct can *can) {
     GPIOD->AFRL |= (0x09 << 0)|(0x09 << 4); // set AF9 for pin 0 and pin 1
    
     RCC->APB1ENR |= BIT(25);        // enable the clock for can1
+    
     can->MCR |= BIT(0);             // enable can initialization mode
     while (!(can->MSR & BIT(0)));   // check if INAK bit is set *meaning HW is in init. --> check if syntax is ok.
+   
     can->MCR &= ~BIT(1);            // exit sleep mode
     while (can->MSR & BIT(1));      // check SLAK bit is clear *meaning no sleep
 
@@ -54,21 +56,23 @@ void Can_Init(struct can *can) {
 
     can->BTR &= ~((0xFUL << 16)|(0x7UL << 20)|(0x3UL << 24)); // reset BTR to zero values
     can->BTR = (0x1UL << 16) | (0 << 20) | (7 << 0); // set BRP, TS1 and TS2
+    
     // put temporary in loop back mode
     can->BTR |= BIT(30);    // to be deleted!!
+
+    // Enable CAN1_Receive FIFO-0 interrupt
+    can->IER |= BIT(4);              // enable Receive Interrupt FMPIE0
+
+    // Enable CAN1_RX0 interrupt in NVIC
+    NVIC->ISER[0] |= (1 << 20);       // Set bit 20 in NVIC_ISER0
+
+
     }
 
 
 bool Can_Start (struct can *can) {
     // Leave Initialization Mode
     
-    /* only for testing "loopback mode"
-    to be deleted after test*/
-
-    // can->BTR |= BIT(30);            // Loop Back Mode enabled.
-    
-    NVIC->ISER[0] = 0xFFFFFFFF;     // need to find out shich one it is.
-    can->IER |= BIT(4);              // enable Receive Interrupt
 
     can->MCR &= ~BIT(1);            // Clear SLEEP
     can->MCR &= ~BIT(0);            // Clear INRQ to go to "normal mode"
@@ -78,15 +82,13 @@ bool Can_Start (struct can *can) {
         asm("nop");
     }
 
-
-
     if (can->MSR & BIT(0)) {        // Check INAK (if clear then ini finished)
         return (0);                 // return no success
     }      
     else return (1);                // return success
-
     }
 
+    
 
 void Can_Filter (struct can *can, uint16_t identifier) {
     can->FMR |= BIT(0);             // set FINIT, Filter init mode on
@@ -154,7 +156,7 @@ void Can_ReceiveMessage (struct can *can, CAN_RX_FRAME *RXFrame) {
         RXFrame->data[6]=(uint8_t)(can->RDH0R >> 16U);
         RXFrame->data[7]=(uint8_t)(can->RDH0R >> 24U);
 
-        can->RF0R |= BIT(5);        // Release the FIFO
+        can->RF0R |= BIT(5);        // Release the FIFO by setting RFOM0
 
         }
 }

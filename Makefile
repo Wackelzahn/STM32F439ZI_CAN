@@ -5,6 +5,7 @@ CFLAGS  ?=  -W -Wall -Wextra -Werror -Wundef -Wshadow -Wdouble-promotion \
 LDFLAGS ?= -Tlink.ld -nostartfiles -nostdlib --specs nano.specs -lc -lgcc -Wl,--gc-sections -Wl,-Map=$@.map
 SOURCES = main.c 
 
+SOURCES += src/startup.c
 SOURCES += src/serial.c
 SOURCES += src/conversion.c
 SOURCES += src/can.c

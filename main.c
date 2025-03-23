@@ -20,6 +20,7 @@
 // USART1 to be used with F411RE, USART2  to be used with F429ZI 
 // ..
 
+#include "startup.h"
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -60,12 +61,6 @@ CAN_TX_FRAME cantx;
 
 
 
-
-void SysTick_Handler(void) {
-  //pick++;
-  // GPIOA->ODR ^= (1 << 5);  // Toggle PA5
-  GPIOB->ODR ^= (1 << 7);  // Toggle PB7
-}
 
 
 void CAN1_RX0_IRQHandler(void) {
@@ -127,8 +122,6 @@ int main(void) {
   uart_init(UART2, 9600);   // Initialize UART2 with 9600 baud rate
 
 
-
-
   Can_Init(CAN1);
   Can_Filter(CAN1, 0x446);
   if (Can_Start(CAN1)) {                // can start successfull
@@ -161,13 +154,10 @@ int main(void) {
   }
 
 
-
   while (1) {
   
-
     spin(999999);  // Delay
     Can_SendMessage(CAN1, &cantx);
-
 
     spin(99999);  // Delay
 
@@ -187,10 +177,16 @@ int main(void) {
 }
 
 
+void SysTick_Handler(void) {
+  //pick++;
+  // GPIOA->ODR ^= (1 << 5);  // Toggle PA5
+  GPIOB->ODR ^= (1 << 7);  // Toggle PB7
+}
 
 
 
-// Startup code
+
+/*/ Startup code
 __attribute__((naked, noreturn)) void _reset(void) {
   // memset .bss to zero, and copy .data section to RAM region
   extern long _sbss, _ebss, _sdata, _edata, _sidata;
@@ -215,4 +211,4 @@ __attribute__((section(".vectors"))) void (*const tab[16 + 91])(void) = {
   USART1_IRQHandler,  // IRQ37
   USART2_IRQHandler,  // IRQ38
   0,0,0};
-
+*/

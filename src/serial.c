@@ -53,7 +53,9 @@ void uart_init(struct uart *uart, unsigned long baud)
     uart->CR2 |= 0 << 12;  // 1 stop bit
     uart->CR1 = BIT(13) | BIT(5) | BIT(2) | BIT(3);  // Enable UART, RX_IRQ, RX, TX
     
-    NVIC->ISER[1] = 0xFFFFFFFF;  // Enable USART1 interrupt  ---->>> Huray, interrupt fired!! need to find out which bit it is for USAT1
+    // Enable NVIC inerrupt for USART1
+    NVIC->ISER[1] |= (1 << 5); // Set bit 5 in NVIC_ISER1
+    
     }
     if (uart == UART2) {
       // tx = PD5, rx = PD6
@@ -90,7 +92,8 @@ void uart_init(struct uart *uart, unsigned long baud)
       uart->CR2 |= 0 << 12;  // 1 stop bit
       uart->CR1 = BIT(13) | BIT(5) | BIT(2) | BIT(3);  // Enable UART, RX_IRQ, RX, TX
     
-      NVIC->ISER[1] = 0xFFFFFFFF;  // Enable USART1 interrupt
+      // Enable NVIC inerrupt for USART2
+      NVIC->ISER[1] |= (1 << 6); // Set bit 6 in NVIC_ISER1
 
     }
 

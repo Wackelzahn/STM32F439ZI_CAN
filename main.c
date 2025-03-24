@@ -107,7 +107,7 @@ static inline void PB7_out_init() {
 int main(void) {
   
   cantx.identifier = 0x446;
-  cantx.length=8;
+  cantx.length=0x0008U;
   cantx.data[0] = 0xFF;
   cantx.data[1] = 0xAF;
   cantx.data[2] = 0x0F;
@@ -115,7 +115,7 @@ int main(void) {
   cantx.data[4] = 0x22;
   cantx.data[5] = 0x22;
   cantx.data[6] = 0x11;
-  cantx.data[7] = 0x01;
+  cantx.data[7] = 0xBB;
 
   systick_init(FREQ / 1);   // 1s second (STM32F4 runs at 16MHz)
   PB7_out_init();           // Set blue LED to output mode

@@ -115,6 +115,7 @@ void Can_SendMessage (struct can *can, CAN_TX_FRAME *TXFrame) {
     can->TI0R &= ~(0x7FFUL << 21U);             // set "standart" identifier
     can->TI0R &= ~BIT(1);                       // set Data Frame
     can->TI0R |= (TXFrame->identifier << 21);   // set the identifier
+    can->TDT0R &= ~(BIT(0) | BIT(1) | BIT(2) | BIT(3) | BIT(8)); // clear data length.
     can->TDT0R |= TXFrame->length << 0;         // set the data length
     
 

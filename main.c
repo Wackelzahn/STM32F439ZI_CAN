@@ -28,6 +28,7 @@
 #include "serial.h"
 #include "conversion.h"
 #include "can.h"
+#include "VEcan.h"
 
 #define FREQ 16000000  // PCLK, internal clock by default, 16 Mhz
 #define BIT(x) (1UL << (x))
@@ -135,11 +136,13 @@ int main(void) {
 
   }
 
+  VECan_Init();
 
   while (1) {
   
     spin(999999);  // Delay
     Can_SendMessage(CAN1, &cantx);
+    VECan_send();
 
     spin(99999);  // Delay
 

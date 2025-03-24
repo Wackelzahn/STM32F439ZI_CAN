@@ -10,6 +10,7 @@ SOURCES += src/startup.c
 SOURCES += src/serial.c
 SOURCES += src/conversion.c
 SOURCES += src/can.c
+SOURCES += src/VEcan.c
 
 # Include files from libraries
 CFLAGS += -Ilib

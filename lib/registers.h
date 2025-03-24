@@ -24,10 +24,21 @@ struct rcc {
 
 // register NVIC
   struct nvic {
-    volatile uint32_t ISER[8], RESERVED0[24], ICER[8], RESERVED1[24], ISPR[8],
-        RESERVED2[24], ICPR[8], RESERVED3[24], IABR[8], RESERVED4[56], IPR[60];
+    volatile uint32_t ISER[8];  // Interrupt Set-Enable Register
+    uint32_t RESERVED0[24];     // Reserved
+    volatile uint32_t ICER[8];  // Interrupt Clear-Enable Register
+    uint32_t RESERVED1[24];     // Reserved
+    volatile uint32_t  ISPR[8]; // Interrupt Set-Pending Register
+    uint32_t  RESERVED2[24];    // Reserved
+    volatile uint32_t ICPR[8];  // Interrupt Clear-Pending Register
+    uint32_t RESERVED3[24];     // Reserved
+    volatile uint32_t IABR[8];  // Interrupt Active-Bit Register
+    uint32_t RESERVED4[56];     // Reserved
+    volatile uint32_t IPR[240]; // Interrupt Priority Registers (8-bit)
+    uint32_t RESERVED5[644];    // Reserved
+    volatile uint32_t STIR;     // Software Trigger Interrupt Register
   };
-  #define NVIC ((struct nvic *) 0xe000e100)  // 4.3.1
+  #define NVIC ((struct nvic *) 0xe000e100) 
 
 
 

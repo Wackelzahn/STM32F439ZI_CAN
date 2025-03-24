@@ -10,6 +10,7 @@ extern int main(void);      // Main function from main.c
 // Weak declarations for interrupt handlers (can be overridden elsewhere)
 void SysTick_Handler(void) __attribute__((weak));
 void CAN1_RX0_IRQHandler(void) __attribute__((weak));
+void CAN1_RX1_IRQHandler(void) __attribute__((weak));
 void USART1_IRQHandler(void) __attribute__((weak));
 void USART2_IRQHandler(void) __attribute__((weak));
 
@@ -33,9 +34,10 @@ __attribute__((section(".vectors"))) void (*const tab[16 + 91])(void) = {
     // IRQ0 to IRQ36 (positions 16 to 52)
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // IRQ0 .. IRQ9
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // IRQ10 .. IRQ19
-    CAN1_RX0_IRQHandler,   // IRQ20: CAN1 RX0
-    0, 0, 0, 0, 0, 0, 0, 0, 0,    // IRQ21 .. IRQ29
-    0, 0, 0, 0, 0, 0, 0,          // IRQ30 .. IRQ36
+    CAN1_RX0_IRQHandler,    // IRQ20: CAN1 RX0
+    CAN1_RX1_IRQHandler,    // IRQ21: CAN RX1
+    0, 0, 0, 0, 0, 0, 0, 0, // IRQ22 .. IRQ29
+    0, 0, 0, 0, 0, 0, 0,    // IRQ30 .. IRQ36
     USART1_IRQHandler,     // IRQ37: USART1
     USART2_IRQHandler,     // IRQ38: USART2
     0, 0, 0               // IRQ39 .. IRQ41 (and beyond, up to 106 total)
@@ -44,5 +46,6 @@ __attribute__((section(".vectors"))) void (*const tab[16 + 91])(void) = {
 // Default weak implementations (optional, can be overridden in other files)
 __attribute__((weak)) void SysTick_Handler(void) { while (1); }
 __attribute__((weak)) void CAN1_RX0_IRQHandler(void) { while (1); }
+__attribute__((weak)) void CAN1_RX1_IRQHandler(void) { while (1); }
 __attribute__((weak)) void USART1_IRQHandler(void) { while (1); }
 __attribute__((weak)) void USART2_IRQHandler(void) { while (1); }

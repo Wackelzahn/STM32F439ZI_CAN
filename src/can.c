@@ -61,10 +61,15 @@ void Can_Init(struct can *can) {
     // can->BTR |= BIT(30);    // to be deleted!!
 
     // Enable CAN1_Receive FIFO-0 interrupt
-    can->IER |= BIT(4);              // enable Receive Interrupt FMPIE0
+    can->IER = 0;   // clear the register
+    can->IER |= BIT(1);              // enable Receive Interrupt FMPIE0
+    
 
     // Enable CAN1_RX0 interrupt in NVIC
-    NVIC->ISER[0] |= (1 << 20);       // Set bit 20 in NVIC_ISER0
+    NVIC->ICER[0] = 0;
+    NVIC->ISER[0] |= (1 << 20);         // Set bit 20 in NVIC_ISER0
+    NVIC->IPR[20] = 0x80;               // set the interrupt priority
+    
 
 
     }

@@ -6,7 +6,7 @@ LDFLAGS ?= -Tlink.ld -nostartfiles -nostdlib --specs nano.specs -lc -lgcc -Wl,--
 SOURCES = main.c 
 
 # Libraries source files
-SOURCES += src/startup.c
+#SOURCES += src/startup.c
 SOURCES += src/serial.c
 SOURCES += src/conversion.c
 SOURCES += src/can.c

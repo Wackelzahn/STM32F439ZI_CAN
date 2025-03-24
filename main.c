@@ -20,7 +20,7 @@
 // USART1 to be used with F411RE, USART2  to be used with F429ZI 
 // ..
 
-#include "startup.h"
+//#include "startup.h"
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -59,7 +59,7 @@ int i = 0;
 CAN_RX_FRAME canrx;
 CAN_TX_FRAME cantx;
 
-
+volatile uint32_t interrupt_count = 0;
 
 
 
@@ -86,6 +86,7 @@ static inline void PB7_out_init() {
 
 
 int main(void) {
+
   
   cantx.identifier = 0x446;
   cantx.length=0x0008U;
@@ -147,14 +148,11 @@ int main(void) {
       kazuka = false;
     }
 
-    if (Can_ReceiveMessage(CAN1, &canrx)) {
-      lenght = lenghtofarray(mesg5);
-      uart_write_buf(UART2, mesg5, lenght);
-    }  
 
 
     if (canrx_pending) {
-      Can_ReceiveMessage (CAN1, &canrx);
+      lenght = lenghtofarray(mesg5);
+      uart_write_buf(UART2, mesg5, lenght);
     }
  
     GPIOB->ODR ^= (1 << 7);  // Toggle PB7
@@ -189,13 +187,20 @@ void USART2_IRQHandler(void) {
 
 
 void CAN1_RX0_IRQHandler(void) {
+  interrupt_count++;
+  canrx_pending = true;
+  Can_ReceiveMessage (CAN1, &canrx);
+}
+
+void CAN1_RX1_IRQHandler(void) {
+  interrupt_count++;
   canrx_pending = true;
   Can_ReceiveMessage (CAN1, &canrx);
 }
 
 
 
-/*/ Startup code
+// Startup code
 __attribute__((naked, noreturn)) void _reset(void) {
   // memset .bss to zero, and copy .data section to RAM region
   extern long _sbss, _ebss, _sdata, _edata, _sidata;
@@ -220,4 +225,4 @@ __attribute__((section(".vectors"))) void (*const tab[16 + 91])(void) = {
   USART1_IRQHandler,  // IRQ37
   USART2_IRQHandler,  // IRQ38
   0,0,0};
-*/
+

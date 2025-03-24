@@ -40,6 +40,7 @@ char mesg1[] = "success, can started!\r\n";
 char mesg2[] = "no success, can not started!\r\n";
 char mesg3[] = "trying to start can bus ";
 char mesg4[] = ".";
+char mesg5[] = "Data received!\r\n";
 
 uint32_t zonk = 0;
 
@@ -62,26 +63,6 @@ CAN_TX_FRAME cantx;
 
 
 
-
-void CAN1_RX0_IRQHandler(void) {
-  canrx_pending = true;
-}
-
-void USART1_IRQHandler(void) {
-  if (UART1->SR & BIT(5)) {
-    bla = (UART1->DR & 0xFF);   // Read data register and by reading, the interrupt flag is cleared
-    uart_write_buf(UART1, &bla, 1);
-    kazuka = true;
-  }
-}
-
-void USART2_IRQHandler(void) {
-  if (UART2->SR & BIT(5)) {
-    bla = (UART2->DR & 0xFF);   // Read data register and by reading, the interrupt flag is cleared
-    uart_write_buf(UART2, &bla, 1);
-    kazuka = true;
-  }
-}
 
 static inline void systick_init(uint32_t ticks) {
   if ((ticks - 1) > 0xffffff) return;    // Systick timer is 24 bit
@@ -123,7 +104,7 @@ int main(void) {
 
 
   Can_Init(CAN1);
-  Can_Filter(CAN1, 0x446);
+  Can_Filter(CAN1, 0x307);
   if (Can_Start(CAN1)) {                // can start successfull
     lenght = lenghtofarray(mesg1);
     uart_write_buf(UART2, mesg1, lenght);
@@ -166,6 +147,12 @@ int main(void) {
       kazuka = false;
     }
 
+    if (Can_ReceiveMessage(CAN1, &canrx)) {
+      lenght = lenghtofarray(mesg5);
+      uart_write_buf(UART2, mesg5, lenght);
+    }  
+
+
     if (canrx_pending) {
       Can_ReceiveMessage (CAN1, &canrx);
     }
@@ -183,6 +170,28 @@ void SysTick_Handler(void) {
   GPIOB->ODR ^= (1 << 7);  // Toggle PB7
 }
 
+void USART1_IRQHandler(void) {
+  if (UART1->SR & BIT(5)) {
+    bla = (UART1->DR & 0xFF);   // Read data register and by reading, the interrupt flag is cleared
+    uart_write_buf(UART1, &bla, 1);
+    kazuka = true;
+  }
+}
+
+void USART2_IRQHandler(void) {
+  if (UART2->SR & BIT(5)) {
+    bla = (UART2->DR & 0xFF);   // Read data register and by reading, the interrupt flag is cleared
+    uart_write_buf(UART2, &bla, 1);
+    kazuka = true;
+  }
+}
+
+
+
+void CAN1_RX0_IRQHandler(void) {
+  canrx_pending = true;
+  Can_ReceiveMessage (CAN1, &canrx);
+}
 
 
 

@@ -28,7 +28,7 @@ void Can_Init (struct can *can);
 bool Can_Start (struct can *can);
 void Can_Filter (struct can *can, uint16_t identifier);
 void Can_SendMessage (struct can *can, CAN_TX_FRAME *TXFrame);
-void Can_ReceiveMessage (struct can *can, CAN_RX_FRAME *RXFrame);
+bool Can_ReceiveMessage (struct can *can, CAN_RX_FRAME *RXFrame);
 
 
 #endif

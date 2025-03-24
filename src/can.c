@@ -58,7 +58,7 @@ void Can_Init(struct can *can) {
     can->BTR = (0x1UL << 16) | (0 << 20) | (7 << 0); // set BRP, TS1 and TS2
     
     // put temporary in loop back mode
-    can->BTR |= BIT(30);    // to be deleted!!
+    // can->BTR |= BIT(30);    // to be deleted!!
 
     // Enable CAN1_Receive FIFO-0 interrupt
     can->IER |= BIT(4);              // enable Receive Interrupt FMPIE0
@@ -95,11 +95,14 @@ void Can_Filter (struct can *can, uint16_t identifier) {
     can->FMR &= ~(0x00003F00U);     // Slave Filter to start from 20
     can->FMR |= (20<< 8);           // CAN1 Filter is assigned from 0 to 19.
     
-    can->FA1R &= ~(BIT(18));        // deactivate filter 18
-    can->FS1R |= BIT(18);           // Set for 32bit scale config
-
-    can->FM1R &= ~BIT(18);          // Set to 0 for identifier "mask" mode
+    can->FA1R &= ~(BIT(18));        // deactivate filter 18 (clear FACT bit)
+    can->FS1R |= BIT(18);           // Set for single 32bit scale config for filter 18 (set FSC18)
+    can->FM1R &= ~BIT(18);          // Set to 1 for identifier "mask" mode
                                     // FSC18 = 1, FBM18 = 0 *mapping see Figure 342
+    
+    can->F18R1 = 0;
+    can->F18R2 = 0;
+
     can->F18R1 = (identifier << 5) << 16;    // Identifier *shift the ID (11bit) to the most left.
     can->F18R2 = (identifier << 5) << 16;    // Identifier Mask
 
@@ -137,7 +140,7 @@ void Can_SendMessage (struct can *can, CAN_TX_FRAME *TXFrame) {
     
 }
 
-void Can_ReceiveMessage (struct can *can, CAN_RX_FRAME *RXFrame) {
+bool Can_ReceiveMessage (struct can *can, CAN_RX_FRAME *RXFrame) {
     if (can->RF0R & 0x00000003U)            // If FIFO-0 has pending message
         {      
             RXFrame->identifier = (can->RI0R >> 3) & 0x1FFFFFFF;    // get identifier of data
@@ -158,8 +161,10 @@ void Can_ReceiveMessage (struct can *can, CAN_RX_FRAME *RXFrame) {
         RXFrame->data[7]=(uint8_t)(can->RDH0R >> 24U);
 
         can->RF0R |= BIT(5);        // Release the FIFO by setting RFOM0
-
+        
+        return (1);
         }
+    else return (0);
 }
 
 

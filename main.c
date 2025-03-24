@@ -20,7 +20,7 @@
 // USART1 to be used with F411RE, USART2  to be used with F429ZI 
 // ..
 
-//#include "startup.h"
+#include "startup.h"
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -200,7 +200,7 @@ void CAN1_RX1_IRQHandler(void) {
 
 
 
-// Startup code
+/*/ Startup code
 __attribute__((naked, noreturn)) void _reset(void) {
   // memset .bss to zero, and copy .data section to RAM region
   extern long _sbss, _ebss, _sdata, _edata, _sidata;
@@ -225,4 +225,4 @@ __attribute__((section(".vectors"))) void (*const tab[16 + 91])(void) = {
   USART1_IRQHandler,  // IRQ37
   USART2_IRQHandler,  // IRQ38
   0,0,0};
-
+*/

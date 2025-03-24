@@ -70,8 +70,6 @@ void Can_Init(struct can *can) {
     NVIC->ISER[0] |= (1 << 20);         // Set bit 20 in NVIC_ISER0
     NVIC->IPR[20] = 0x80;               // set the interrupt priority
     
-
-
     }
 
 

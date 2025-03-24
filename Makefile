@@ -5,10 +5,15 @@ CFLAGS  ?=  -W -Wall -Wextra -Werror -Wundef -Wshadow -Wdouble-promotion \
 LDFLAGS ?= -Tlink.ld -nostartfiles -nostdlib --specs nano.specs -lc -lgcc -Wl,--gc-sections -Wl,-Map=$@.map
 SOURCES = main.c 
 
+# Libraries source files
 SOURCES += src/startup.c
 SOURCES += src/serial.c
 SOURCES += src/conversion.c
 SOURCES += src/can.c
+
+# Include files from libraries
+CFLAGS += -Ilib
+
 
 
 ifeq ($(OS),Windows_NT)

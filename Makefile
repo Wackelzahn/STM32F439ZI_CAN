@@ -11,6 +11,7 @@ SOURCES += src/serial.c
 SOURCES += src/conversion.c
 SOURCES += src/can.c
 SOURCES += src/VEcan.c
+SOURCES += src/I2C.c
 
 # Include files from libraries
 CFLAGS += -Ilib

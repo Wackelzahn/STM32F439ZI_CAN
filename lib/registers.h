@@ -16,6 +16,14 @@ struct rcc {
   #define RCC ((struct rcc *) 0x40023800)
 
 
+// register I2C
+struct I2C {
+  volatile uint32_t CR1, CR2, OAR1, OAR2, DR, SR1, SR2, CCR, TRISE, FLTR;
+};
+#define I2C1 ((struct I2C *) 0x40005400)
+
+
+
 // register SYSTICK
   struct systick {
     volatile uint32_t CSR, RVR, CVR, CALIB;

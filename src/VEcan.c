@@ -213,15 +213,12 @@ void VECan_Init () {
     
     // Frame 0x355 Battery State Info SOC & SOH
     threefiftyfive.identifier = 0x0355;
-    threefiftyfive.length = 0x0008U; 
-    threefiftyfive.data[0] = 0x8E;   // LSB SOC (%)
-    threefiftyfive.data[1] = 0x14;   // MSB
-    threefiftyfive.data[2] = 0xF9;   // LSB (A/10) DeciAmp, signed!
-    threefiftyfive.data[3] = 0xFF;   // MSB
-    threefiftyfive.data[4] = 0xB4;   // LSB (T/10) DeciTemp, signed! 
-    threefiftyfive.data[5] = 0x00;   // MSB
-    threefiftyfive.data[6] = 0x00;    
-    threefiftyfive.data[7] = 0x00; 
+    threefiftyfive.length = 0x0004U; 
+    threefiftyfive.data[0] = 0x33;   // LSB SOC (%)
+    threefiftyfive.data[1] = 0x00;   // MSB
+    threefiftyfive.data[2] = 0x64;   // LSB (A/10) DeciAmp, signed!
+    threefiftyfive.data[3] = 0x00;   // MSB
+  
 
     // Frame 0x351 DVCC: CVL, CCL, DCL, DVL
     threefiftyone.identifier = 0x0351;

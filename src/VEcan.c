@@ -9,6 +9,10 @@ uint16_t disvoltage = 42000; // max discharge voltage in mv
 uint16_t discurrent = 30000; // max discharge current in ma
 uint16_t SOH = 100; // SOH place holder
 
+uint8_t splitter[2];
+
+
+
 unsigned char mes[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 unsigned char bmsname[8] = {'C', 'F', 'P', ' ', 'B', 'M', 'S', ' '}; // Comprehensice Full Protection BMS
 unsigned char bmsmanu[8] = {'C', '.', 'E', '.', ' ', 'E', 'N', 'G'};
@@ -43,6 +47,10 @@ CAN_TX_FRAME threeeightyone;        // snPart2
 
 void VECan_Init () {
     
+
+    splitter[0] = (uint8_t)SOH & 0xff;
+    splitter[1] = ((uint8_t)SOH >> 8);
+
     // Frame 0x380 Serial No. Part 1
     threeeighty.identifier = 0x0380;
     threeeighty.length = 0x0008U;
@@ -216,8 +224,8 @@ void VECan_Init () {
     threefiftyfive.length = 0x0004U; 
     threefiftyfive.data[0] = 0x33;   // LSB SOC (%)
     threefiftyfive.data[1] = 0x00;   // MSB
-    threefiftyfive.data[2] = 0x64;   // LSB (A/10) DeciAmp, signed!
-    threefiftyfive.data[3] = 0x00;   // MSB
+    threefiftyfive.data[2] = (uint8_t)SOH & 0xff;   // LSB SOH (%)
+    threefiftyfive.data[3] = ((uint8_t)SOH >> 8);   // MSB
   
 
     // Frame 0x351 DVCC: CVL, CCL, DCL, DVL

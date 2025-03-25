@@ -85,6 +85,157 @@ void VECan_Init () {
     threeseventyeight.data[6] = 0x00;
     threeseventyeight.data[7] = 0x00;
 
+    // Frame 0x377 Cell Name with Maximum Cell Temperature
+    threeseventyseven.identifier = 0x0377;
+    threeseventyseven.length = 0x0008U;
+    threeseventyseven.data[0] = '0';   // 0301 Cell 03 Bank 01
+    threeseventyseven.data[1] = '3';
+    threeseventyseven.data[2] = '0';
+    threeseventyseven.data[3] = '1';
+    threeseventyseven.data[4] = 0x00;
+    threeseventyseven.data[5] = 0x00;
+    threeseventyseven.data[6] = 0x00;
+    threeseventyseven.data[7] = 0x00;
+    
+    // Frame 0x376 Cell Name with Minimum Cell Temperature
+    threeseventysix.identifier = 0x0376;
+    threeseventysix.length = 0x0008U;
+    threeseventysix.data[0] = '1';   // 1601 Cell 03 Bank 01
+    threeseventysix.data[1] = '6';
+    threeseventysix.data[2] = '0';
+    threeseventysix.data[3] = '1';
+    threeseventysix.data[4] = 0x00;
+    threeseventysix.data[5] = 0x00;
+    threeseventysix.data[6] = 0x00;
+    threeseventysix.data[7] = 0x00;
+
+    // Frame 0x375 Cell Name with MAX Cell Voltage
+    threeseventyfive.identifier = 0x0375;
+    threeseventyfive.length = 0x0008U;
+    threeseventyfive.data[0] = '1';   // 1201 Cell 03 Bank 01
+    threeseventyfive.data[1] = '2';
+    threeseventyfive.data[2] = '0';
+    threeseventyfive.data[3] = '1';
+    threeseventyfive.data[4] = 0x00;
+    threeseventyfive.data[5] = 0x00;
+    threeseventyfive.data[6] = 0x00;
+    threeseventyfive.data[7] = 0x00;
+
+    // Frame 0x374 Cell Name with MIN Cell Voltage
+    threeseventyfour.identifier = 0x0374;
+    threeseventyfour.length = 0x0008U;
+    threeseventyfour.data[0] = '0';   // 0701 Cell 03 Bank 01
+    threeseventyfour.data[1] = '7';
+    threeseventyfour.data[2] = '0';
+    threeseventyfour.data[3] = '1';
+    threeseventyfour.data[4] = 0x00;
+    threeseventyfour.data[5] = 0x00;
+    threeseventyfour.data[6] = 0x00;
+    threeseventyfour.data[7] = 0x00;
+
+    // Frame 0x373 Cell Info: Voltage and Temperature
+    threeseventythree.identifier = 0x0373;
+    threeseventythree.length = 0x0008U; 
+    threeseventythree.data[0] = 0x01;   // LSB lowest cell voltage
+    threeseventythree.data[1] = 0x0D;   // MSB
+    threeseventythree.data[2] = 0x08;   // LSB highest cell voltage
+    threeseventythree.data[3] = 0x0D;   // MSB
+    threeseventythree.data[4] = 0x28;   // LSB lowest cell temperature
+    threeseventythree.data[5] = 0x01;   // MSB
+    threeseventythree.data[6] = 0x29;   // LSB highest cell temperature
+    threeseventythree.data[7] = 0x01;   // MSB
+
+
+    // Frame 0x372 Battery Bank Info
+    threeseventytwo.identifier = 0x0372;
+    threeseventytwo.length = 0x0008U; 
+    threeseventytwo.data[0] = 0x02;   // LSB no. Batteries online
+    threeseventytwo.data[1] = 0x00;   // MSB
+    threeseventytwo.data[2] = 0x01;   // LSB no. Batteries blocked charge
+    threeseventytwo.data[3] = 0x00;   // MSB
+    threeseventytwo.data[4] = 0x01;   // LSB no. Batteries blocked discharge
+    threeseventytwo.data[5] = 0x00;   // MSB
+    threeseventytwo.data[6] = 0x02;   // LSB no. Batteries offline
+    threeseventytwo.data[7] = 0x00;   // MSB
+
+    // Frame 0x360 Battery Bank Info
+    threesixty.identifier = 0x0360;
+    threesixty.length = 0x0001U; 
+    threesixty.data[0] = 0x00;   // unknown
+
+    // Frame 0x35F Battery Info Firmware & Capacity available
+    threefiftyF.identifier = 0x035F;
+    threefiftyF.length = 0x0008U; 
+    threefiftyF.data[0] = 0x01;   // firmware version high
+    threefiftyF.data[1] = 0x00;   // firmware version low
+    threefiftyF.data[2] = 0x6E;   // hardware version high
+    threefiftyF.data[3] = 0x01;   // hardware version low
+    threefiftyF.data[4] = 0x32;   // LSB Battery capacity available
+    threefiftyF.data[5] = 0x00;   // MSB
+    threefiftyF.data[6] = 0x00;   // unknown
+    threefiftyF.data[7] = 0x00;   // 
+
+    // Frame 0x35E Manufacturer Info / Name
+    threefiftyE.identifier = 0x035E;
+    threefiftyE.length = 0x0008U; 
+    threefiftyE.data[0] = 'C';   
+    threefiftyE.data[1] = '.';   
+    threefiftyE.data[2] = 'E';   
+    threefiftyE.data[3] = '.';   
+    threefiftyE.data[4] = ' ';   
+    threefiftyE.data[5] = 'E';   
+    threefiftyE.data[6] = 'N';   
+    threefiftyE.data[7] = 'G';   
+
+    // Frame 0x35A Alarms / Warnings
+    threefiftyA.identifier = 0x035A;
+    threefiftyA.length = 0x0008U; 
+    threefiftyA.data[0] = 0x00;
+    threefiftyA.data[1] = 0x00;  
+    threefiftyA.data[2] = 0x00;    
+    threefiftyA.data[3] = 0x00;   
+    threefiftyA.data[4] = 0x00;  
+    threefiftyA.data[5] = 0x00;    
+    threefiftyA.data[6] = 0x00;    
+    threefiftyA.data[7] = 0x00;    
+
+    // Frame 0x356 Battery Status: Voltage, Current, Temperature
+    threefiftysix.identifier = 0x0356;
+    threefiftysix.length = 0x0008U; 
+    threefiftysix.data[0] = 0x8E;   // LSB voltage in Millivolt
+    threefiftysix.data[1] = 0x14;   // MSB
+    threefiftysix.data[2] = 0xF9;   // LSB (A/10) DeciAmp, signed!
+    threefiftysix.data[3] = 0xFF;   // MSB
+    threefiftysix.data[4] = 0xB4;   // LSB (T/10) DeciTemp, signed! 
+    threefiftysix.data[5] = 0x00;   // MSB
+    threefiftysix.data[6] = 0x00;    
+    threefiftysix.data[7] = 0x00; 
+    
+    // Frame 0x355 Battery State Info SOC & SOH
+    threefiftyfive.identifier = 0x0355;
+    threefiftyfive.length = 0x0008U; 
+    threefiftyfive.data[0] = 0x8E;   // LSB SOC (%)
+    threefiftyfive.data[1] = 0x14;   // MSB
+    threefiftyfive.data[2] = 0xF9;   // LSB (A/10) DeciAmp, signed!
+    threefiftyfive.data[3] = 0xFF;   // MSB
+    threefiftyfive.data[4] = 0xB4;   // LSB (T/10) DeciTemp, signed! 
+    threefiftyfive.data[5] = 0x00;   // MSB
+    threefiftyfive.data[6] = 0x00;    
+    threefiftyfive.data[7] = 0x00; 
+
+    // Frame 0x351 DVCC: CVL, CCL, DCL, DVL
+    threefiftyone.identifier = 0x0351;
+    threefiftyone.length = 0x0008U; 
+    threefiftyone.data[0] = 0x38;   // LSB (V/10) DeciVolt CVL 
+    threefiftyone.data[1] = 0x02;   // MSB
+    threefiftyone.data[2] = 0xE8;   // LSB (A/10) DeciAmp CCL 
+    threefiftyone.data[3] = 0x03;   // MSB
+    threefiftyone.data[4] = 0xE8;   // LSB (A/10) DeciAmp DCL
+    threefiftyone.data[5] = 0x03;   // MSB
+    threefiftyone.data[6] = 0xC7;   // LSB (V/10) DeciVolt DVL
+    threefiftyone.data[7] = 0x01;   // MSB
+
+
 
 
 }
@@ -94,4 +245,17 @@ void VECan_send () {
     Can_SendMessage(CAN1, &threeeightyone);
     Can_SendMessage(CAN1, &threeseventynine);
     Can_SendMessage(CAN1, &threeseventyeight);
+    Can_SendMessage(CAN1, &threeseventyseven);
+    Can_SendMessage(CAN1, &threeseventysix);
+    Can_SendMessage(CAN1, &threeseventyfive);
+    Can_SendMessage(CAN1, &threeseventyfour);
+    Can_SendMessage(CAN1, &threeseventythree);
+    Can_SendMessage(CAN1, &threeseventytwo);
+    Can_SendMessage(CAN1, &threesixty);
+    Can_SendMessage(CAN1, &threefiftyF);
+    Can_SendMessage(CAN1, &threefiftyE);
+    Can_SendMessage(CAN1, &threefiftyA);
+    Can_SendMessage(CAN1, &threefiftysix);
+    Can_SendMessage(CAN1, &threefiftyfive);
+    Can_SendMessage(CAN1, &threefiftyone);
 }

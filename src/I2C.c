@@ -41,6 +41,49 @@ void I2C1_Init(void) {
 
     // enable I2C1
     I2C1->CR1 |= (1U << 0);
+   
+}
 
-    
+void I2C1_Start (void) {
+    I2C1->CR1 |= (1U << 8);  // I2C Start
+    while (!(I2C1->SR1 & (1U << 0)));
+}
+
+
+void I2C1_Stop (void) {
+    I2C1->CR1 |= (1U << 9); // I2C Stop
+}
+
+
+void I2C1_Write (uint8_t data) {
+    I2C1->DR = data;
+    while (!(I2C1->SR1 & (1U << 7)));
+}
+
+
+uint8_t I2C1_Read (uint8_t ack) {
+    if (ack)
+    {
+        I2C1->CR1 |= (1U << 10);
+    }
+    else 
+    {
+        I2C1 ->CR1 &= ~(1U << 10);
+    }
+
+    while (!(I2C1->SR1 & (1U << 6)));
+    return (uint8_t)I2C1->DR;
+}
+
+
+void I2C1_WriteData(uint8_t address, uint8_t *data, uint16_t size) {
+    I2C1_Start();
+    I2C1_Write(address << 1);
+
+    for (uint16_t i=0; i < size; i++)
+    {
+        I2C1_Write(data[i]);
+    }
+
+    I2C1_Stop();
 }

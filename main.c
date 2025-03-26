@@ -29,6 +29,8 @@
 #include "conversion.h"
 #include "can.h"
 #include "VEcan.h"
+// #include "I2C.h"
+#include "INA228.h"
 
 #define FREQ 16000000  // PCLK, internal clock by default, 16 Mhz
 #define BIT(x) (1UL << (x))
@@ -104,6 +106,7 @@ int main(void) {
   PB7_out_init();           // Set blue LED to output mode
   uart_init(UART2, 9600);   // Initialize UART2 with 9600 baud rate
 
+  INA228_Init();
 
   Can_Init(CAN1);
   Can_Filter(CAN1, 0x307);

@@ -1,6 +1,8 @@
 #include "I2C.h"
 
 
+// uint32_t temp;
+
 void I2C1_Init(void) {
     // Prepare for PB8 = I1C1_SCL and PB9 = I2C1_SDA
 
@@ -57,33 +59,20 @@ void I2C1_Stop (void) {
 
 void I2C1_Write (uint8_t data) {
     I2C1->DR = data;
-    while (!(I2C1->SR1 & (1U << 7)));
+    while (!(I2C1->SR1 & (1U << 2)));   // Wait until Byte transfer is finished
 }
 
 
 uint8_t I2C1_Read (uint8_t ack) {
-    if (ack)
-    {
-        I2C1->CR1 |= (1U << 10);
+    if (ack) {
+        I2C1->CR1 |= (1U << 10);        // Set ACK bit
+    } else {
+        I2C1->CR1 &= ~(1U << 10);       // Clear ACK bit (NACK)
     }
-    else 
-    {
-        I2C1 ->CR1 &= ~(1U << 10);
-    }
-
-    while (!(I2C1->SR1 & (1U << 6)));
-    return (uint8_t)I2C1->DR;
+    while (!(I2C1->SR1 & (1U << 6)));   // Wait for RxNE (data received)
+    return (uint8_t)I2C1->DR;           // Read the byte
 }
 
 
-void I2C1_WriteData(uint8_t address, uint8_t *data, uint16_t size) {
-    I2C1_Start();
-    I2C1_Write(address << 1);
 
-    for (uint16_t i=0; i < size; i++)
-    {
-        I2C1_Write(data[i]);
-    }
 
-    I2C1_Stop();
-}

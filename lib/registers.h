@@ -49,6 +49,17 @@ struct I2C {
   #define NVIC ((struct nvic *) 0xe000e100) 
 
 
+// register SCB
+  struct scb {
+    volatile uint32_t CPUID, ICSR, VTOR, AIRCR, SCR, CCR, SHPR1, SHPR2, SHPR3,
+        SHCRS, CFSR, HFSR, DFSR, MMFAR, BFAR, AFSR, PFR0, PFR1, DFR0, AFR0, MMFR0,
+        MMFR1, MMFR2, MMFR3, ISAR0, ISAR1, ISAR2, ISAR3, ISAR4, CLIDR, CTR, CCSIDR,
+        CSSELR, CPACR, NSACR, RESERVED0[93], STIR, RESERVED1[15], MVFR0, MVFR1, MVFR2;
+  };
+  #define SCB ((struct scb *) 0xe000ed00)
+
+
+
 
 // CAN register
 struct can {

@@ -12,7 +12,7 @@
 
 void INA228_ReadRegister(uint8_t reg, uint8_t *data, uint8_t len);
 void INA228_WriteRegister(uint8_t reg, uint16_t value);
-float INA228_ReadVBUS(void);
+uint32_t INA228_ReadVBUS(void);
 void INA228_Init(void);
 
 

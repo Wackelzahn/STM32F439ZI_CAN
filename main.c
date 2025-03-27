@@ -59,7 +59,7 @@ uint32_t myNum = 3367756;
 int lenght = 0;
 int i = 0;
 
-float Sprong;
+uint32_t Sprong;
 
 CAN_RX_FRAME canrx;
 CAN_TX_FRAME cantx;
@@ -157,7 +157,7 @@ int main(void) {
       kazuka = false;
     }
 
-
+    Sprong = INA228_ReadVBUS();
 
     if (canrx_pending) {
       lenght = lenghtofarray(mesg5);

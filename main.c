@@ -59,6 +59,8 @@ uint32_t myNum = 3367756;
 int lenght = 0;
 int i = 0;
 
+float Sprong;
+
 CAN_RX_FRAME canrx;
 CAN_TX_FRAME cantx;
 
@@ -103,10 +105,11 @@ int main(void) {
   cantx.data[7] = 0xBB;
 
   systick_init(FREQ / 1);   // 1s second (STM32F4 runs at 16MHz)
-  PB7_out_init();           // Set blue LED to output mode
+  //PB7_out_init();           // Set blue LED to output mode
   uart_init(UART2, 9600);   // Initialize UART2 with 9600 baud rate
 
   INA228_Init();
+  Sprong = INA228_ReadVBUS();
 
   Can_Init(CAN1);
   Can_Filter(CAN1, 0x307);

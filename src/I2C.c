@@ -24,7 +24,6 @@ void I2C1_Init(void) {
     GPIOB->OTYPER |= (1U << 9);      // Set to open-drain
     GPIOB->AFRH &= ~(0xFU << 4);     // Clear AFRH[7:4]
     GPIOB->AFRH |= (4U << 4);        // Set to AF4 (0100b)
-
     GPIOB->OSPEEDR &= ~(3U << 18);    // medium speed is ok
     GPIOB->OSPEEDR |= (1U << 18);    // Medium speed
 
@@ -59,7 +58,7 @@ void I2C1_Stop (void) {
 
 void I2C1_Write (uint8_t data) {
     I2C1->DR = data;
-    while (!(I2C1->SR1 & (1U << 2)));   // Wait until Byte transfer is finished
+    
 }
 
 

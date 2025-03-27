@@ -7,7 +7,7 @@
 #include "I2C.h"
 
 
-#define INA228_ADDR 0x40
+#define INA228_ADDR 0x40U
 
 
 void INA228_ReadRegister(uint8_t reg, uint8_t *data, uint8_t len);

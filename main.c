@@ -117,7 +117,16 @@ int main(void) {
   //PB7_out_init();           // Set blue LED to output mode
   uart_init(UART2, 9600);   // Initialize UART2 with 9600 baud rate
 
-  INA228_Init();
+  
+  if (INA228_Init()) {
+    (void)charstr;
+  }
+  else {
+    (void)charstr;
+  };
+  
+  
+  
   if (INA228_ReadVBUS(&dataLsb, &dataMsb)) {
     lsb = dataLsb;
     msb = dataMsb;

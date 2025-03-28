@@ -3,11 +3,23 @@
 
 int32_t counter;
 
-void INA228_Init(void) {
+bool INA228_Init(void) {
     // Set to bus voltage continuous mode
-    //INA228_WriteRegister(0x00, 0x0006);
+    
     I2C1_Init();
+    if (INA228_WriteRegister(0x00, 0x8000)){    // INA228 RESET
+        return true;    // success
+    }
+    else {
+        return false;   // failure
+    }
+
 }
+
+
+
+
+
 
 bool INA228_ReadRegister(uint8_t reg, uint8_t *data, uint8_t len) {
     I2C1_Start();                       // Generate start condition
@@ -19,7 +31,6 @@ bool INA228_ReadRegister(uint8_t reg, uint8_t *data, uint8_t len) {
     {
        if (counter > 1000) {
            return false;
-           break;
      }
      counter++;
    };  
@@ -33,30 +44,27 @@ bool INA228_ReadRegister(uint8_t reg, uint8_t *data, uint8_t len) {
     I2C1_Write(reg);                    // Send register address
     
     // Wait for the data register to be empty
-  //  counter = 0;
-    while (!(I2C1->SR1 & (1U << 7)));
-    // {    // TXE bit check
-  //  if (counter > 1000) {
-   //     return false;
-   //     break;
-  //  }
-  //  counter++;
-  //  };  
-    
+    counter = 0;
+    while (!(I2C1->SR1 & (1U << 7)))    // TXE bit check
+    {                                   
+        if (counter > 1000) {
+        return false;
+        }
+        counter++;
+    };  
     
     I2C1_Start();                       // Generate repeated start
     I2C1_Write((INA228_ADDR << 1) | 1); // Send device address (read)
     
     // Wait for address to be acknowledged
     counter = 0;
-    while (!(I2C1->SR1 & (1U << 1)));
-    // {   // Wait for ADDR (Slave send Acknowledge bit)
-   // if (counter > 1000) {
-    //    return false;
-    //    break;
-   // }
-   // counter++;
-   // }; 
+    while (!(I2C1->SR1 & (1U << 1)))
+    {  
+        if (counter > 1000) {
+            return false;
+   }
+        counter++;
+   }; 
 
 
 
@@ -75,18 +83,24 @@ bool INA228_ReadRegister(uint8_t reg, uint8_t *data, uint8_t len) {
     
     return true;
 
+    }
 
-}
-
-void INA228_WriteRegister(uint8_t reg, uint16_t value) {
+bool INA228_WriteRegister(uint8_t reg, uint16_t value) 
+    {
     I2C1_Start();
     
     // Send the address with the R/W bit set to 0 (write)
     I2C1_Write(INA228_ADDR << 1);       // Write operation to set R/W bit low.
+    counter = 0;
+    while (!(I2C1->SR1 & (1U << 1)))    // Wait for ADDR (Slave send Acknowledge bit)
+    {  
+        if (counter > 1000) {
+            return false;
+        }
+        counter++;
+    };
     
-    // Wait for address to be acknowledged
-    while (!(I2C1->SR1 & (1U << 1)));   // Wait for ADDR (Slave send Acknowledge bit)
-    
+
     // clear the ADDR flag by reading SR1 and then SR2
     uint32_t temp = I2C1->SR1;          // Read first SR1
     temp = I2C1->SR2;                   // then read SR2 to clear ADDR
@@ -94,16 +108,41 @@ void INA228_WriteRegister(uint8_t reg, uint16_t value) {
     
     // Send the data byte (register to be accessed)
     I2C1_Write(reg);                    // Register to be accessed
-    
-    // Wait for the data register to be empty
-    while (!(I2C1->SR1 & (1U << 7)));    // TXE bit check
+    counter = 0;
+    while (!(I2C1->SR1 & (1U << 7)))    // TXE bit check
+    {  
+        if (counter > 1000) {
+            return false;
+        }
+        counter++;
+    };
 
     // Send data
     I2C1_Write((value >> 8) & 0xFFU);   // Write High byte
-    while (!(I2C1->SR1 & (1U << 7)));    // TXE bit check
+    counter = 0;
+    while (!(I2C1->SR1 & (1U << 7)))   // TXE bit check
+    {  
+        if (counter > 1000) {
+            return false;
+        }
+        counter++;
+    };    
+
+    
     I2C1_Write(value & 0xFFU);          // Write Low byte
-    while (!(I2C1->SR1 & (1U << 7)));    // TXE bit check
+    counter = 0;
+    while (!(I2C1->SR1 & (1U << 7)))    // TXE bit check
+    {  
+        if (counter > 1000) {
+            return false;
+        }
+        counter++;
+    }; 
+    
+    
     I2C1_Stop();
+   
+    return true;
 }
 
 

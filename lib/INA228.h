@@ -14,6 +14,6 @@ bool INA228_ReadRegister(uint8_t reg, uint8_t *data, uint8_t len);
 void INA228_WriteRegister(uint8_t reg, uint16_t value);
 bool INA228_ReadVBUS(uint8_t *lsb, uint8_t *msb);
 void INA228_Init(void);
-
+bool INA228_ReadTemp(uint16_t *temp);
 
 #endif

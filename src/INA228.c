@@ -106,6 +106,7 @@ void INA228_WriteRegister(uint8_t reg, uint16_t value) {
     I2C1_Stop();
 }
 
+
 bool INA228_ReadVBUS(uint8_t *lsb, uint8_t *msb) {
     uint8_t vbus_data[3];
     uint64_t product = 0;
@@ -120,5 +121,19 @@ bool INA228_ReadVBUS(uint8_t *lsb, uint8_t *msb) {
     *lsb = (uint8_t)(product & 0xFF);
     *msb = (uint8_t)((product & 0xFF00) >> 8);
 
+    return true;
+}
+
+bool INA228_ReadTemp(uint16_t *temp) {
+    uint8_t temp_data[2];
+    uint64_t product = 0;
+    uint32_t factor = 12802;    // bingo
+    if (!(INA228_ReadRegister(0x06, temp_data, 2))) return false;  
+    uint16_t temp_raw = ((uint16_t)temp_data[0] << 8) | ((uint16_t)temp_data[1] << 0);
+    
+    product = factor * temp_raw;
+    product = product >> 14;
+    *temp = (uint16_t)(product);
+    
     return true;
 }

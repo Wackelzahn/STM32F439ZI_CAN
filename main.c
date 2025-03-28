@@ -67,6 +67,7 @@ uint8_t dataMsb;
 uint32_t Sprong1, Sprong2;
 uint64_t Kaponk;
 uint64_t Kagong;
+uint16_t Kaponk1, Temperature;
 
 
 CAN_RX_FRAME canrx;
@@ -121,7 +122,10 @@ int main(void) {
     lsb = dataLsb;
     msb = dataMsb;
   }
-
+  if (INA228_ReadTemp(&Kaponk1)) {
+    Temperature = Kaponk1;
+    (void)Temperature;
+  }
 
 
 

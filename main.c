@@ -29,7 +29,6 @@
 #include "conversion.h"
 #include "can.h"
 #include "VEcan.h"
-// #include "I2C.h"
 #include "INA228.h"
 
 #define FREQ 16000000  // PCLK, internal clock by default, 16 Mhz

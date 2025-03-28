@@ -58,8 +58,17 @@ char txt[10];
 uint32_t myNum = 3367756;
 int lenght = 0;
 int i = 0;
+uint8_t lsb;
+uint8_t msb;
 
-uint32_t Sprong;
+uint8_t dataLsb;
+uint8_t dataMsb;
+
+
+uint32_t Sprong1, Sprong2;
+uint64_t Kaponk;
+uint64_t Kagong;
+
 
 CAN_RX_FRAME canrx;
 CAN_TX_FRAME cantx;
@@ -109,7 +118,17 @@ int main(void) {
   uart_init(UART2, 9600);   // Initialize UART2 with 9600 baud rate
 
   INA228_Init();
-  Sprong = INA228_ReadVBUS();
+  if (INA228_ReadVBUS(&dataLsb, &dataMsb)) {
+    lsb = dataLsb;
+    msb = dataMsb;
+  }
+
+
+
+
+
+  
+
 
   Can_Init(CAN1);
   Can_Filter(CAN1, 0x307);
@@ -157,7 +176,7 @@ int main(void) {
       kazuka = false;
     }
 
-    Sprong = INA228_ReadVBUS();
+
 
     if (canrx_pending) {
       lenght = lenghtofarray(mesg5);

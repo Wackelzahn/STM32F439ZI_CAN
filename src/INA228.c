@@ -80,13 +80,19 @@ void INA228_WriteRegister(uint8_t reg, uint16_t value) {
     I2C1_Stop();
 }
 
-uint32_t INA228_ReadVBUS(void) {
+bool INA228_ReadVBUS(uint8_t *lsb, uint8_t *msb) {
     uint8_t vbus_data[3];
-    
+    uint64_t product = 0;
+    uint32_t factor = 1310920;
     INA228_ReadRegister(0x05, vbus_data, 3);
     uint32_t vbus_raw = ((uint32_t)vbus_data[0] << 12) | ((uint32_t)vbus_data[1] << 4) | (vbus_data[2] >> 4);
     if (vbus_raw & 0x80000) vbus_raw |= 0xFFF00000; // Sign extend if negative
     //return (float)(vbus_raw * 0.00125);  // Assumes positive voltage; use sign extension if needed
- 
-    return vbus_raw;
+    
+    product = factor * vbus_raw;
+    product = product >> 26;
+    *lsb = (uint8_t)(product & 0xFF);
+    *msb = (uint8_t)((product & 0xFF00) >> 8);
+
+    return true;
 }

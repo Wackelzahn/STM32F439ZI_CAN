@@ -64,7 +64,7 @@ uint8_t dataLsb;
 uint8_t dataMsb;
 
 
-uint32_t Sprong1, Sprong2;
+uint32_t Sprong1, Sprong2, Kaponk2, Current_mA; 
 uint64_t Kaponk;
 uint64_t Kagong;
 uint16_t Kaponk1, Temperature;
@@ -118,12 +118,12 @@ int main(void) {
   uart_init(UART2, 9600);   // Initialize UART2 with 9600 baud rate
 
   
-  if (INA228_Init()) {
-    (void)charstr;
-  }
-  else {
-    (void)charstr;
-  };
+    if (INA228_Init()) {
+      (void)charstr;        // signalling that the INA228 is initialized
+    }
+    else {
+      (void)charstr;
+    };
   
   
   
@@ -134,6 +134,10 @@ int main(void) {
   if (INA228_ReadTemp(&Kaponk1)) {
     Temperature = Kaponk1;
     (void)Temperature;
+  }
+  if (INA228_ReadCurr(&Kaponk2)) {
+    Current_mA = Kaponk2;
+    (void)Current_mA;
   }
 
 

@@ -7,14 +7,28 @@ bool INA228_Init(void) {
     // Set to bus voltage continuous mode
     
     I2C1_Init();
+
+    // INA228 RESET
     if (INA228_WriteRegister(0x00, 0x8000)){    // INA228 RESET
-        return true;    // success
     }
-    else {
-        return false;   // failure
+    else return false;   // failure
+    
+    // INA228 Set Shunt voltage Range to +/-40.96mV
+    // equals max shunt current (250uOhm) at 163.84A
+    if (INA228_WriteRegister(0x00, 0x0008)){   
+    }                                           
+    else return false;   // failure
+    
+    // INA228 Set Shunt_Cal (0.000250 Ohm)
+    // current LSB equals 163.84A / 2'19 = 312.5uA
+    // 13107.2 x 10'6 x CURRENT_LSB x RSHUNT x 4 = 4096
+    if (INA228_WriteRegister(0x02, 0x1000)){    
+    }                                           
+    else return false;   // failure   
+    
+    return true;
     }
 
-}
 
 
 
@@ -31,9 +45,9 @@ bool INA228_ReadRegister(uint8_t reg, uint8_t *data, uint8_t len) {
     {
        if (counter > 1000) {
            return false;
-     }
-     counter++;
-   };  
+        }
+        counter++;
+    };  
 
     
     // clear the ADDR flag by reading SR1 and then SR2
@@ -160,6 +174,22 @@ bool INA228_ReadVBUS(uint8_t *lsb, uint8_t *msb) {
     *lsb = (uint8_t)(product & 0xFF);
     *msb = (uint8_t)((product & 0xFF00) >> 8);
 
+    return true;
+}
+
+bool INA228_ReadCurr(uint32_t *curr) {
+    uint8_t curr_data[3];
+    uint32_t factor = 16384;    // bingo!
+    uint64_t Current_mA = 0;
+    // uint32_t curr_raw_test = 0x00000FAF; // 4015 * 312.5 uA = 1254.6875 mA
+    // uint64_t curr_raw_test = 0x00005228; // 512000 * 312.5 uA = 160000 mA --->>> 16bit overflow!!!
+    if (!(INA228_ReadRegister(0x07, curr_data, 3))) return false;  
+    uint32_t curr_raw = ((uint32_t)curr_data[0] << 12) | ((uint16_t)curr_data[1] << 4) | ((uint32_t)curr_data[2] >> 4);
+    // (void)curr_raw;
+    Current_mA = curr_raw * factor;
+    Current_mA = Current_mA >> 14;
+    *curr = (uint32_t)(Current_mA);
+    
     return true;
 }
 

@@ -21,13 +21,13 @@
 #include "registers.h"
 
 #define BIT(x) (1UL << (x))
-
+int32_t counter_loop = 0;
 
 
 // function for initializing the can Interface for STM32F439
 // can_rx on PD0, can_tx on PD1
 
-void Can_Init(struct can *can) {
+bool Can_Init(struct can *can) {
 
     RCC->AHB1ENR |= BIT(3);         // enable clock for GPIOD
     GPIOD->MODER |= BIT(1);         // set PD0 to "alternate" function
@@ -39,10 +39,29 @@ void Can_Init(struct can *can) {
     RCC->APB1ENR |= BIT(25);        // enable the clock for can1
     
     can->MCR |= BIT(0);             // enable can initialization mode
-    while (!(can->MSR & BIT(0)));   // check if INAK bit is set *meaning HW is in init. --> check if syntax is ok.
-   
+
+    counter_loop = 0;
+    while (!(can->MSR & BIT(0)))    // check if INAK bit is set *meaning HW is in init. --> check if syntax is ok.
+    {                                   
+        if (counter_loop > 1000) {
+        return false;
+        }
+        counter_loop++;
+    }; 
+
+
+
     can->MCR &= ~BIT(1);            // exit sleep mode
-    while (can->MSR & BIT(1));      // check SLAK bit is clear *meaning no sleep
+
+    counter_loop = 0;
+    while (can->MSR & BIT(1))       // check SLAK bit is clear *meaning no sleep
+    {                                   
+        if (counter_loop > 1000) {
+        return false;
+        }
+        counter_loop++;
+    }; 
+
 
     /* configure the timing with following parameters
         * Normal Mode
@@ -70,6 +89,8 @@ void Can_Init(struct can *can) {
     NVIC->ISER[0] |= (1 << 20);         // Set bit 20 in NVIC_ISER0
     NVIC->IPR[20] = 0x80;               // set the interrupt priority
     
+    return true;                // return success
+
     }
 
 
@@ -116,8 +137,16 @@ void Can_Filter (struct can *can, uint16_t identifier) {
 
 }
 
-void Can_SendMessage (struct can *can, CAN_TX_FRAME *TXFrame) {
-    while ((can->TSR & (0x1UL << 26U)) == 0);          // wait until transmit mailbox 0 is empty *TME0->Bit26
+bool Can_SendMessage (struct can *can, CAN_TX_FRAME *TXFrame) {
+    counter_loop = 0;
+    while ((can->TSR & (0x1UL << 26U)) == 0)    // wait until transmit mailbox 0 is empty *TME0->Bit26
+    {                                   
+        if (counter_loop > 1000) {
+        return false;
+        }
+        counter_loop++;
+    }; 
+
     can->TI0R &= ~(0x7FFUL << 21U);             // set "standart" identifier
     can->TI0R &= ~BIT(1);                       // set Data Frame
     can->TI0R |= (TXFrame->identifier << 21);   // set the identifier
@@ -140,6 +169,8 @@ void Can_SendMessage (struct can *can, CAN_TX_FRAME *TXFrame) {
     
     // start the transmission
     can->TI0R |= (1U << 0U);        // transmission request TXRQ
+
+    return true;                // return success
     
 }
 

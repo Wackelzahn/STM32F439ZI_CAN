@@ -9,7 +9,13 @@ bool INA228_Init(void) {
     I2C1_Init();
 
     // INA228 RESET
-    if (INA228_WriteRegister(0x00, 0x8000)){    // INA228 RESET
+    if (INA228_WriteRegister(0x00, 0x8000)){  
+    }
+    else return false;   // failure
+
+    // INA228 Set ADC sample averaging count to 16
+    // Conversion times to 1052 μs
+    if (INA228_WriteRegister(0x01, 0xFB6A)){    
     }
     else return false;   // failure
     
@@ -28,7 +34,6 @@ bool INA228_Init(void) {
     
     return true;
     }
-
 
 
 
@@ -159,20 +164,19 @@ bool INA228_WriteRegister(uint8_t reg, uint16_t value)
     return true;
 }
 
-
-bool INA228_ReadVBUS(uint8_t *lsb, uint8_t *msb) {
+// Read VBUS voltage
+// VBUS = (VSHUNT * 0.00125) * 1310920 / 2^26
+// 195.3125 μV/LSB
+bool INA228_ReadVBUS(uint16_t *vbus) {
     uint8_t vbus_data[3];
     uint64_t product = 0;
-    uint32_t factor = 1310920;
+    uint64_t factor = 204800;    // bingo!
     if (!(INA228_ReadRegister(0x05, vbus_data, 3))) return false;  
     uint32_t vbus_raw = ((uint32_t)vbus_data[0] << 12) | ((uint32_t)vbus_data[1] << 4) | (vbus_data[2] >> 4);
-    if (vbus_raw & 0x80000) vbus_raw |= 0xFFF00000; // Sign extend if negative
-    //return (float)(vbus_raw * 0.00125);  // Assumes positive voltage; use sign extension if needed
     
-    product = factor * vbus_raw;
-    product = product >> 26;
-    *lsb = (uint8_t)(product & 0xFF);
-    *msb = (uint8_t)((product & 0xFF00) >> 8);
+    product = factor * vbus_raw;   // be carefull. To cast to 64 bit during multiplication, facter needs to be 64 bit
+    product = product >> 20;
+    *vbus = (uint16_t)(product & 0xFFFF);
 
     return true;
 }
@@ -181,14 +185,43 @@ bool INA228_ReadCurr(uint32_t *curr) {
     uint8_t curr_data[3];
     uint32_t factor = 16384;    // bingo!
     uint64_t Current_mA = 0;
-    // uint32_t curr_raw_test = 0x00000FAF; // 4015 * 312.5 uA = 1254.6875 mA
-    // uint64_t curr_raw_test = 0x00005228; // 512000 * 312.5 uA = 160000 mA --->>> 16bit overflow!!!
+    //uint32_t test = 0;
     if (!(INA228_ReadRegister(0x07, curr_data, 3))) return false;  
     uint32_t curr_raw = ((uint32_t)curr_data[0] << 12) | ((uint16_t)curr_data[1] << 4) | ((uint32_t)curr_data[2] >> 4);
-    // (void)curr_raw;
+    // Sign extend if negative
+    if (curr_raw & 0x80000) curr_raw |= 0xFFF00000; 
+    
     Current_mA = curr_raw * factor;
     Current_mA = Current_mA >> 14;
-    *curr = (uint32_t)(Current_mA);
+    *curr = (uint32_t)(Current_mA & 0xFFFFFFFF);
+    
+    return true;
+}
+
+// Read Shunt voltage
+// VSHUNT = (VSHUNT * LSB)  --> 78.125 nV/LSB when ADCRANGE = 1
+bool INA228_ReadShuntV(uint32_t *shuntV) {
+    uint8_t shuntV_data[3];
+    uint32_t factor = 5120;    // bingo!
+    uint64_t ShuntV_uV = 0;
+    if (!(INA228_ReadRegister(0x04, shuntV_data, 3))) return false;  
+    uint32_t shuntV_raw =  ((uint32_t)shuntV_data[0] << 12) | ((uint16_t)shuntV_data[1] << 4) | ((uint32_t)shuntV_data[2] >> 4);
+  
+    ShuntV_uV = factor * shuntV_raw;
+    ShuntV_uV = ShuntV_uV >> 16;
+    *shuntV = (uint32_t)(ShuntV_uV);
+    
+    return true;
+}
+
+// Read Power
+// Power register holds the value in [mW] for an current lsb of 0.0003125A
+// The power value is unsigned!!!
+bool INA228_ReadPower(uint32_t *powermW) {
+    uint8_t power_data[3];
+    if (!(INA228_ReadRegister(0x08, power_data, 3))) return false;  
+    uint32_t power_raw = ((uint32_t)power_data[0] << 12) | ((uint16_t)power_data[1] << 4) | ((uint32_t)power_data[2] >> 4);
+    *powermW = power_raw;
     
     return true;
 }

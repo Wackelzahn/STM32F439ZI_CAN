@@ -64,10 +64,10 @@ uint8_t dataLsb;
 uint8_t dataMsb;
 
 
-uint32_t Sprong1, Sprong2, Kaponk2, Current_mA; 
+uint32_t Sprong1, Sprong2, Kaponk2, Kaponk3, Kaponk4, Current_mA, ShuntV_uV, Power_mW; 
 uint64_t Kaponk;
 uint64_t Kagong;
-uint16_t Kaponk1, Temperature;
+uint16_t Kaponk1, Temperature, vbus, vbus_mV;
 
 
 CAN_RX_FRAME canrx;
@@ -127,9 +127,9 @@ int main(void) {
   
   
   
-  if (INA228_ReadVBUS(&dataLsb, &dataMsb)) {
-    lsb = dataLsb;
-    msb = dataMsb;
+  if (INA228_ReadVBUS(&vbus)) {
+    vbus_mV = vbus;
+    (void)vbus_mV;
   }
   if (INA228_ReadTemp(&Kaponk1)) {
     Temperature = Kaponk1;
@@ -140,7 +140,15 @@ int main(void) {
     (void)Current_mA;
   }
 
+  if (INA228_ReadShuntV(&Kaponk3)) {
+    ShuntV_uV = Kaponk3;
+    (void)ShuntV_uV;
+  }
 
+  if (INA228_ReadPower(&Kaponk4)) {
+    Power_mW = Kaponk4;
+    (void)Power_mW;
+  }
 
 
   

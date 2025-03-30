@@ -29,7 +29,7 @@ bool INA228_ReadTemp(int16_t *temp);
 bool INA228_ReadCurr(int32_t *curr);
 // Read Shunt voltage
 // Shunt voltage result in uV
-bool INA228_ReadShuntV(uint32_t *shuntV);
+bool INA228_ReadShuntV(int32_t *shuntV);
 // Read Power
 // Power result in mW
 bool INA228_ReadPower(uint32_t *powermW);

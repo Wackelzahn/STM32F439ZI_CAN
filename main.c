@@ -65,11 +65,11 @@ uint8_t dataLsb;
 uint8_t dataMsb;
 
 
-uint32_t Sprong1, Sprong2, Kaponk3, Kaponk4, ShuntV_uV, Power_mW; 
+uint32_t Sprong1, Sprong2, Kaponk4, Power_mW; 
 uint64_t Kaponk;
 uint64_t Kagong;
 uint16_t vbus, vbus_mV;
-int32_t Current_mA, Kaponk2;
+int32_t Current_mA, Kaponk2, Kaponk3, ShuntV_uV;
 int16_t Kaponk1, Temperature;
 
 
@@ -210,6 +210,7 @@ int main(void) {
 
     INA228_ReadCurr(&Kaponk2);
     INA228_ReadTemp(&Kaponk1);
+    INA228_ReadShuntV(&Kaponk3);
 
     if (canrx_pending) {
       lenght = lenghtofarray(mesg5);

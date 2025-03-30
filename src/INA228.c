@@ -36,10 +36,6 @@ bool INA228_Init(void) {
     }
 
 
-
-
-
-
 bool INA228_ReadRegister(uint8_t reg, uint8_t *data, uint8_t len) {
     I2C1_Start();                       // Generate start condition
     I2C1_Write(INA228_ADDR << 1);       // Send device address (write)
@@ -202,16 +198,18 @@ bool INA228_ReadCurr(int32_t *curr) {
 
 // Read Shunt voltage
 // VSHUNT = (VSHUNT * LSB)  --> 78.125 nV/LSB when ADCRANGE = 1
-bool INA228_ReadShuntV(uint32_t *shuntV) {
+bool INA228_ReadShuntV(int32_t *shuntV) {
     uint8_t shuntV_data[3];
-    uint32_t factor = 5120;    // bingo!
-    uint64_t ShuntV_uV = 0;
+    int32_t factor = 80;    // bingo!
+    int64_t ShuntV_uV = 0;
     if (!(INA228_ReadRegister(0x04, shuntV_data, 3))) return false;  
-    uint32_t shuntV_raw =  ((uint32_t)shuntV_data[0] << 12) | ((uint16_t)shuntV_data[1] << 4) | ((uint32_t)shuntV_data[2] >> 4);
-  
-    ShuntV_uV = factor * shuntV_raw;
-    ShuntV_uV = ShuntV_uV >> 16;
-    *shuntV = (uint32_t)(ShuntV_uV);
+    uint32_t shuntV_raw =  (shuntV_data[0] << 12) | (shuntV_data[1] << 4) | (shuntV_data[2] >> 4);
+    // Sign extend if negative
+    if (shuntV_raw & 0x80000U) shuntV_raw |= 0xFFF00000U;
+    // Convert to uV
+    ShuntV_uV = factor * (int32_t)shuntV_raw; // typecast into signed int32_t
+    ShuntV_uV = ShuntV_uV >> 10;
+    *shuntV = (int32_t)(ShuntV_uV);
     
     return true;
 }

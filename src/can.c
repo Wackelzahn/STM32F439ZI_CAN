@@ -11,22 +11,21 @@
 // This source code is intended to create 
 //    - the initialization of the can interface
 //      1. Initialization of the GPIO
-//      2. 
+//      2. Setting up the Filter
+//      3. fUNCTIONS FOR sending and receiving messages
 // -----------------------------------------------------
-
-
 
 
 #include "can.h"
 #include "registers.h"
 
-#define BIT(x) (1UL << (x))
-int32_t counter_loop = 0;
+#define BIT(x) (1UL << (x)) // Bit bangging
+int32_t counter_loop = 0;   // counter for waiting loops
 
 
-// function for initializing the can Interface for STM32F439
-// can_rx on PD0, can_tx on PD1
-
+/*  function for initializing the can Interface for STM32F439
+    can_rx on PD0, can_tx on PD1
+    returns false if initialization failed */
 bool Can_Init(struct can *can) {
 
     RCC->AHB1ENR |= BIT(3);         // enable clock for GPIOD
@@ -93,7 +92,8 @@ bool Can_Init(struct can *can) {
 
     }
 
-
+/*  function to set the CAN in normal mode
+    returns false if initialization failed */
 bool Can_Start (struct can *can) {
     // Leave Initialization Mode
     
@@ -113,7 +113,10 @@ bool Can_Start (struct can *can) {
     }
 
     
-
+/*  function to set the filter for the CAN, setting filter reg CAN1 from 0 to 19
+    set the filter to 0x307, set the filter to FIFO-0, set the filter to 32bit scale
+    set the filter to "mask" mode, set the filter to "FIFO-0" mode
+    set the filter to "active" mode */
 void Can_Filter (struct can *can, uint16_t identifier) {
     can->FMR |= BIT(0);             // set FINIT, Filter init mode on
     can->FMR &= ~(0x00003F00U);     // Slave Filter to start from 20
@@ -137,6 +140,8 @@ void Can_Filter (struct can *can, uint16_t identifier) {
 
 }
 
+/*  function to send a message over the CAN bus
+    returns false if sending failed */
 bool Can_SendMessage (struct can *can, CAN_TX_FRAME *TXFrame) {
     counter_loop = 0;
     while ((can->TSR & (0x1UL << 26U)) == 0)    // wait until transmit mailbox 0 is empty *TME0->Bit26
@@ -168,12 +173,14 @@ bool Can_SendMessage (struct can *can, CAN_TX_FRAME *TXFrame) {
         ((uint32_t) TXFrame->data[4] << 0U);  
     
     // start the transmission
-    can->TI0R |= (1U << 0U);        // transmission request TXRQ
+    can->TI0R |= (1U << 0U);    // transmission request TXRQ
 
     return true;                // return success
     
 }
 
+/*  function to check if a message is pending in the FIFO-0
+    returns true if a message is pending and is being read */
 bool Can_ReceiveMessage (struct can *can, CAN_RX_FRAME *RXFrame) {
     if (can->RF0R & 0x00000003U)            // If FIFO-0 has pending message
         {      

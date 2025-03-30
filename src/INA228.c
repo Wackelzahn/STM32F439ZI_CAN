@@ -181,19 +181,21 @@ bool INA228_ReadVBUS(uint16_t *vbus) {
     return true;
 }
 
-bool INA228_ReadCurr(uint32_t *curr) {
+
+// Read Current
+// 312.5 μA/LSB
+bool INA228_ReadCurr(int32_t *curr) {
     uint8_t curr_data[3];
-    uint32_t factor = 16384;    // bingo!
-    uint64_t Current_mA = 0;
-    //uint32_t test = 0;
+    int32_t factor = 320;    // bingo!
+    int32_t Current_mA = 0;
     if (!(INA228_ReadRegister(0x07, curr_data, 3))) return false;  
-    uint32_t curr_raw = ((uint32_t)curr_data[0] << 12) | ((uint16_t)curr_data[1] << 4) | ((uint32_t)curr_data[2] >> 4);
+    uint32_t curr_raw = (curr_data[0] << 12) | (curr_data[1] << 4) | (curr_data[2] >> 4);
     // Sign extend if negative
-    if (curr_raw & 0x80000) curr_raw |= 0xFFF00000; 
-    
-    Current_mA = curr_raw * factor;
-    Current_mA = Current_mA >> 14;
-    *curr = (uint32_t)(Current_mA & 0xFFFFFFFF);
+    if (curr_raw & 0x80000U) curr_raw |= 0xFFF00000U;
+    // Convert to mA
+    Current_mA = (int32_t)curr_raw * factor; // typecast into signed int32_t 
+    Current_mA = Current_mA >> 10;
+    *curr = Current_mA;
     
     return true;
 }
@@ -226,16 +228,19 @@ bool INA228_ReadPower(uint32_t *powermW) {
     return true;
 }
 
-bool INA228_ReadTemp(uint16_t *temp) {
+// Read Temperature
+// returns signed int16_t in .xx [Celsius]
+// 7.8125 m°C/LSB
+bool INA228_ReadTemp(int16_t *temp) {  
     uint8_t temp_data[2];
-    uint64_t product = 0;
-    uint32_t factor = 12802;    // bingo
+    int32_t product = 0;
+    int32_t factor = 800;    // bingo
     if (!(INA228_ReadRegister(0x06, temp_data, 2))) return false;  
-    uint16_t temp_raw = ((uint16_t)temp_data[0] << 8) | ((uint16_t)temp_data[1] << 0);
+    int16_t temp_raw = (temp_data[0] << 8) | (temp_data[1] << 0);
     
     product = factor * temp_raw;
-    product = product >> 14;
-    *temp = (uint16_t)(product);
+    product = product >> 10;
+    *temp = (int16_t)(product);
     
     return true;
 }

@@ -10,8 +10,6 @@
 #define INA228_ADDR 0x40U
 
 
-
-
 bool INA228_ReadRegister(uint8_t reg, uint8_t *data, uint8_t len);
 bool INA228_WriteRegister(uint8_t reg, uint16_t value);
 
@@ -23,11 +21,17 @@ bool INA228_Init(void);
 // Read VBUS voltage
 // VBUS result in mV
 bool INA228_ReadVBUS(uint16_t *vbus);
-
-
-bool INA228_ReadTemp(uint16_t *temp);
-bool INA228_ReadCurr(uint32_t *curr);
+// Read Temperature
+// Temperature result in 0.01 degree Celsius
+bool INA228_ReadTemp(int16_t *temp);
+// Read Current
+// Current result in mA
+bool INA228_ReadCurr(int32_t *curr);
+// Read Shunt voltage
+// Shunt voltage result in uV
 bool INA228_ReadShuntV(uint32_t *shuntV);
+// Read Power
+// Power result in mW
 bool INA228_ReadPower(uint32_t *powermW);
 
 #endif

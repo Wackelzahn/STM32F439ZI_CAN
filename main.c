@@ -50,6 +50,7 @@ uint32_t zonkchar = 0;
 char zonkachar;
 bool kazuka = false;
 bool canrx_pending = false;
+bool failure = false;
 
 char bla;
 
@@ -64,10 +65,12 @@ uint8_t dataLsb;
 uint8_t dataMsb;
 
 
-uint32_t Sprong1, Sprong2, Kaponk2, Kaponk3, Kaponk4, Current_mA, ShuntV_uV, Power_mW; 
+uint32_t Sprong1, Sprong2, Kaponk3, Kaponk4, ShuntV_uV, Power_mW; 
 uint64_t Kaponk;
 uint64_t Kagong;
-uint16_t Kaponk1, Temperature, vbus, vbus_mV;
+uint16_t vbus, vbus_mV;
+int32_t Current_mA, Kaponk2;
+int16_t Kaponk1, Temperature;
 
 
 CAN_RX_FRAME canrx;
@@ -154,9 +157,14 @@ int main(void) {
   
 
 
-  Can_Init(CAN1);
+  if (Can_Init(CAN1)) {
+    failure = false;  // can initialized
+  }
+  else failure = true;   // can not initialized
+  
+
   Can_Filter(CAN1, 0x307);
-  if (Can_Start(CAN1)) {                // can start successfull
+  if (Can_Start(CAN1)) {                  // can start successfull
     lenght = lenghtofarray(mesg1);
     uart_write_buf(UART2, mesg1, lenght);
     i = 0;
@@ -200,7 +208,8 @@ int main(void) {
       kazuka = false;
     }
 
-
+    INA228_ReadCurr(&Kaponk2);
+    INA228_ReadTemp(&Kaponk1);
 
     if (canrx_pending) {
       lenght = lenghtofarray(mesg5);

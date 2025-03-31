@@ -1,6 +1,8 @@
 #include "I2C.h"
 
 
+uint32_t cnt = 0;
+
 // uint32_t temp;
 
 void I2C1_Init(void) {
@@ -68,7 +70,16 @@ uint8_t I2C1_Read (uint8_t ack) {
     } else {
         I2C1->CR1 &= ~(1U << 10);       // Clear ACK bit (NACK)
     }
-    while (!(I2C1->SR1 & (1U << 6)));   // Wait for RxNE (data received)
+
+    cnt = 0;
+    while (!(I2C1->SR1 & (1U << 6)))    // Wait for RxNE (data received)
+    {  
+        if (cnt > 1000) {
+            return 0x00U;                // Timeout
+        }
+        cnt++;
+    };
+
     return (uint8_t)I2C1->DR;           // Read the byte
 }
 

@@ -3,6 +3,12 @@
 
 int32_t counter;
 
+
+
+// Initialize the INA228
+// Set Shunt voltage Range to +/-40.96mV
+// Set Shunt_Cal (0.000250 Ohm)
+// Set ADC sample averaging count to 16
 bool INA228_Init(void) {
     // Set to bus voltage continuous mode
     
@@ -160,6 +166,18 @@ bool INA228_WriteRegister(uint8_t reg, uint16_t value)
     return true;
 }
 
+// Set Shunt Tempco
+// The 16 bit register provides a resolution of 1ppm/°C/LSB
+bool INA228_SetShuntTempco(uint16_t tempco) {
+    // Set the shunt temperature compensation register
+    if (INA228_WriteRegister(0x03, tempco)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
 // Read VBUS voltage
 // VBUS = (VSHUNT * 0.00125) * 1310920 / 2^26
 // 195.3125 μV/LSB
@@ -220,11 +238,27 @@ bool INA228_ReadShuntV(int32_t *shuntV) {
 bool INA228_ReadPower(uint32_t *powermW) {
     uint8_t power_data[3];
     if (!(INA228_ReadRegister(0x08, power_data, 3))) return false;  
-    uint32_t power_raw = ((uint32_t)power_data[0] << 12) | ((uint16_t)power_data[1] << 4) | ((uint32_t)power_data[2] >> 4);
+    uint32_t power_raw = (power_data[0] << 16) | (power_data[1] << 8) | (power_data[2] << 0);
     *powermW = power_raw;
     
     return true;
 }
+
+// Read Energy
+// Energy register holds the value in [Joule] for an current lsb of 0.0003125A
+// The energy value is unsigned!!! 40bit
+bool INA228_ReadEnergy(uint64_t *energy) {
+    uint8_t energy_data[5];
+    if (!(INA228_ReadRegister(0x09, energy_data, 3))) return false;  
+    uint64_t energy_raw = ((uint64_t)energy_data[0] << 32) | ((uint64_t)energy_data[1] <<24) | ((uint64_t)energy_data[2] << 16) | ((uint64_t)energy_data[3] << 8) | ((uint64_t)energy_data[4] << 0);
+    // energy_data is without explicitly casting, casted into int32. Here 
+    // it is casted into int64_t. This is important to avoid overflow
+    *energy = energy_raw;
+    
+    return true;
+}
+
+
 
 // Read Temperature
 // returns signed int16_t in .xx [Celsius]
@@ -239,6 +273,29 @@ bool INA228_ReadTemp(int16_t *temp) {
     product = factor * temp_raw;
     product = product >> 10;
     *temp = (int16_t)(product);
+    
+    return true;
+}
+
+
+// Read Manufacturer ID of the INA228
+// Manufacturer ID is 0x5449
+bool INA228_ReadManufacturerID(uint16_t *manufID) {
+    uint8_t manufID_data[2];
+    if (!(INA228_ReadRegister(0x3E, manufID_data, 2))) return false;  
+    uint16_t manufID_raw = (manufID_data[0] << 8) | (manufID_data[1] << 0);
+    *manufID = manufID_raw;
+    
+    return true;
+}
+
+// Read Device ID of the INA228
+// Device ID is 0x228x -> last byte is revision ID
+bool INA228_ReadDieID(uint16_t *devID) {
+    uint8_t devID_data[2];
+    if (!(INA228_ReadRegister(0x3F, devID_data, 2))) return false;  
+    uint16_t devID_raw = (devID_data[0] << 8) | (devID_data[1] << 0);
+    *devID = devID_raw;
     
     return true;
 }

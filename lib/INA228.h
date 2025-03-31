@@ -18,6 +18,10 @@ bool INA228_WriteRegister(uint8_t reg, uint16_t value);
 // Set Shunt_Cal (0.000250 Ohm)
 bool INA228_Init(void);
 
+
+// Set Shunt Tempco
+// The 16 bit register provides a resolution of 1ppm/°C/LSB
+bool INA228_SetShuntTempco(uint16_t tempco);
 // Read VBUS voltage
 // VBUS result in mV
 bool INA228_ReadVBUS(uint16_t *vbus);
@@ -33,5 +37,15 @@ bool INA228_ReadShuntV(int32_t *shuntV);
 // Read Power
 // Power result in mW
 bool INA228_ReadPower(uint32_t *powermW);
+//Read Energy
+// Energy result in Joule
+bool INA228_ReadEnergy(uint64_t *energy);
+// Read Manufacturer ID
+bool INA228_ReadManufacturerID(uint16_t *manufID);
+// Read Die ID
+bool INA228_ReadDieID(uint16_t *dieID);
+
+
+
 
 #endif

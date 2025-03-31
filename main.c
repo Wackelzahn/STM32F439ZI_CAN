@@ -66,9 +66,9 @@ uint8_t dataMsb;
 
 
 uint32_t Sprong1, Sprong2, Kaponk4, Power_mW; 
-uint64_t Kaponk;
+uint64_t Kaponk, Energy_Joule;
 uint64_t Kagong;
-uint16_t vbus, vbus_mV;
+uint16_t vbus, vbus_mV, DieID, ManufacturerID;
 int32_t Current_mA, Kaponk2, Kaponk3, ShuntV_uV;
 int16_t Kaponk1, Temperature;
 
@@ -128,7 +128,12 @@ int main(void) {
       (void)charstr;
     };
   
-  
+  if (INA228_SetShuntTempco(0x0000)) {
+    (void)charstr;        // signalling that the INA228 is initialized
+  }
+  else {
+    (void)charstr;
+  };
   
   if (INA228_ReadVBUS(&vbus)) {
     vbus_mV = vbus;
@@ -153,8 +158,24 @@ int main(void) {
     (void)Power_mW;
   }
 
+  if (INA228_ReadDieID(&DieID))
+    {
+      (void)DieID;
+    };
 
+  if (INA228_ReadManufacturerID(&ManufacturerID))
+    {
+      (void)ManufacturerID;
+    };
   
+    if(INA228_ReadEnergy(&Energy_Joule))
+    {
+      (void)Energy_Joule;
+    };
+
+
+
+
 
 
   if (Can_Init(CAN1)) {
